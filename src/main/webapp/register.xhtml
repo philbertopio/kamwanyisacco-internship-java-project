@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Register - Kimwanyi SACCO</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Poppins:wght@600;700&amp;display=swap" rel="stylesheet"/>
+    <h:outputStylesheet library="css" name="styles.css"/>
+</h:head>
+<h:body>
+    <div class="auth-wrapper">
+        <div class="auth-card" style="max-width: 520px;">
+            <div class="brand-mark">K</div>
+            <h1>Create your account</h1>
+            <p class="auth-subtitle">Join Kimwanyi SACCO - savings and loans made easy</p>
+
+            <h:messages globalOnly="true" layout="table" errorClass="alert alert-error" infoClass="alert alert-success"/>
+
+            <h:form id="registerForm">
+
+                <input type="hidden"
+                       name="#{requestScope['_csrf'].parameterName}"
+                       value="#{requestScope['_csrf'].token}" />
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fullName">Full Name</label>
+                        <h:inputText id="fullName" value="#{registrationBean.fullName}" required="true"
+                                     requiredMessage="Full name is required"/>
+                        <h:message for="fullName" styleClass="field-error"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="nationalId">National ID</label>
+                        <h:inputText id="nationalId" value="#{registrationBean.nationalId}" required="true"
+                                     requiredMessage="National ID is required"/>
+                        <h:message for="nationalId" styleClass="field-error"/>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <h:inputText id="username" value="#{registrationBean.username}" required="true"
+                                     requiredMessage="Username is required"/>
+                        <h:message for="username" styleClass="field-error"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <h:inputText id="email" value="#{registrationBean.email}" required="true"
+                                     requiredMessage="Email is required"/>
+                        <h:message for="email" styleClass="field-error"/>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <h:inputSecret id="password" value="#{registrationBean.password}" required="true"
+                                       requiredMessage="Password is required"/>
+                        <span class="field-hint">At least 8 characters</span>
+                        <h:message for="password" styleClass="field-error"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <h:inputSecret id="confirmPassword" value="#{registrationBean.confirmPassword}" required="true"
+                                       requiredMessage="Please confirm your password"/>
+                        <h:message for="confirmPassword" styleClass="field-error"/>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <h:inputText id="phone" value="#{registrationBean.phone}" required="true"
+                                     requiredMessage="Phone number is required"/>
+                        <h:message for="phone" styleClass="field-error"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address (optional)</label>
+                        <h:inputText id="address" value="#{registrationBean.address}"/>
+                    </div>
+                </div>
+
+                <h:commandButton value="Create Account" action="#{registrationBean.register}"
+                                 styleClass="btn btn-primary btn-block"/>
+            </h:form>
+
+            <div class="auth-footer">
+                Already have an account? <a href="login.xhtml">Log in</a>
+            </div>
+        </div>
+    </div>
+</h:body>
+</html>
