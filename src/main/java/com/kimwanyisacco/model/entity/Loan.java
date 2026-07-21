@@ -1,6 +1,7 @@
 package com.kimwanyisacco.model.entity;
 
 import com.kimwanyisacco.model.enums.LoanStatus;
+import com.kimwanyisacco.model.entity.Member;
 import lombok.*;
 
 import javax.persistence.*;
@@ -21,7 +22,7 @@ public class Loan extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
-    private SaccoMember member;
+    private Member member;
 
     @Column(name = "principal_amount", nullable = false, precision = 19, scale = 2)
     private BigDecimal principalAmount;

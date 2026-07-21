@@ -2,10 +2,11 @@ package com.kimwanyisacco.model.entity;
 
 
 import com.kimwanyisacco.model.enums.UserRole;
+import com.kimwanyisacco.model.entity.Member;
 import lombok.*;
 
 import javax.persistence.*;
-import java.lang.reflect.Member;
+
 
 @Entity
 @Table(name = "users", uniqueConstraints = {
@@ -37,7 +38,7 @@ public class User extends BaseEntity{
     private boolean active = true;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private SaccoMember member;
+    private Member member;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Admin admin;

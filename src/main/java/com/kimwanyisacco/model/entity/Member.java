@@ -19,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @ToString(exclude = {"savingsAccount", "loans"})
-public class SaccoMember extends BaseEntity {
+public class Member extends BaseEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
