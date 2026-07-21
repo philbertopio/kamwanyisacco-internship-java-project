@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

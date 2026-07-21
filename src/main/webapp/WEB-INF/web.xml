@@ -24,7 +24,7 @@
 
     <context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>com.pahappa.sacco.config.PersistenceConfig</param-value>
+        <param-value>com.kimwanyisacco.config.PersistenceConfig</param-value>
     </context-param>
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
@@ -61,7 +61,11 @@
         </init-param>
         <init-param>
             <param-name>contextConfigLocation</param-name>
-            <param-value>com.pahappa.sacco.config.WebConfig</param-value>
+            <param-value>
+                com.kimwanyisacco.config.WebConfig
+                com.kimwanyisacco.config.SecurityConfig
+
+            </param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>

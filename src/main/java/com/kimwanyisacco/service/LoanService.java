@@ -20,4 +20,8 @@ public interface LoanService {
     List<LoanResponse> getLoansByMember(Long memberId);
 
     List<LoanResponse> getOverdueLoans();
+
+    /** Powers the admin loan-review screen. */
+    List<LoanResponse> getPendingLoans();
 }
+

@@ -1,8 +1,6 @@
 package com.kimwanyisacco.web;
 
 
-
-
 import com.kimwanyisacco.dto.response.LoanResponse;
 import com.kimwanyisacco.dto.response.MemberResponse;
 import com.kimwanyisacco.dto.response.SavingsAccountResponse;
@@ -15,41 +13,44 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Getter
-@Component("memberDashboardBean")
+@Component("adminDashboardBean")
 @Scope("request")
-public class MemberDashboardBean {
+public class AdminDashboardBean {
 
     private final MemberService memberService;
     private final SavingsService savingsService;
     private final LoanService loanService;
-    private final CurrentUserContext currentUser;
 
-    private MemberResponse member;
-    private SavingsAccountResponse savingsAccount;
-    private List<LoanResponse> loans;
+    private int totalMembers;
+    private BigDecimal totalSavingsHeld;
+    private int pendingLoansCount;
+    private int overdueLoansCount;
 
     @Autowired
-    public MemberDashboardBean(MemberService memberService, SavingsService savingsService,
-                               LoanService loanService, CurrentUserContext currentUser) {
+    public AdminDashboardBean(MemberService memberService, SavingsService savingsService, LoanService loanService) {
         this.memberService = memberService;
         this.savingsService = savingsService;
         this.loanService = loanService;
-        this.currentUser = currentUser;
     }
 
     @PostConstruct
     public void init() {
-        Long memberId = currentUser.getMemberId();
-        this.member = memberService.getMemberById(memberId);
-        this.savingsAccount = savingsService.getAccountByMemberId(memberId);
-        this.loans = loanService.getLoansByMember(memberId);
-    }
+        List<MemberResponse> members = memberService.getAllMembers();
+        this.totalMembers = members.size();
 
-    public boolean isHasActiveLoan() {
-        return loans != null && loans.stream().anyMatch(l -> "ACTIVE".equals(l.getStatus().name()));
+        List<SavingsAccountResponse> accounts = savingsService.getAllAccounts();
+        this.totalSavingsHeld = accounts.stream()
+                .map(SavingsAccountResponse::getBalance)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        List<LoanResponse> pending = loanService.getPendingLoans();
+        this.pendingLoansCount = pending.size();
+
+        List<LoanResponse> overdue = loanService.getOverdueLoans();
+        this.overdueLoansCount = overdue.size();
     }
 }
-
