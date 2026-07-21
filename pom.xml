@@ -181,6 +181,18 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.4.0</version>
             </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven3-plugin</artifactId>
+                <version>1.10.7</version> <!-- Or a version compatible with your project -->
+                <configuration>
+                    <container>
+                        <containerId>tomcat9x</containerId> <!-- example container -->
+                        <type>embedded</type>
+                    </container>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

@@ -1,5 +1,10 @@
 package com.kimwanyisacco.service;
 
+import com.kimwanyisacco.dto.request.LoanApplicationRequest;
+import com.kimwanyisacco.dto.request.LoanDecisionRequest;
+import com.kimwanyisacco.dto.request.LoanRepaymentRequest;
+import com.kimwanyisacco.dto.response.LoanResponse;
+
 import java.util.List;
 
 public interface LoanService {
