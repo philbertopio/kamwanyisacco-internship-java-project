@@ -32,7 +32,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
-            <version>7.0.7</version>
+            <version>${spring.version}</version>
             <scope>compile</scope>
         </dependency>
 
@@ -119,6 +119,27 @@
             <scope>provided</scope>
         </dependency>
 
+
+
+
+
+        <!-- Spring Security -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-web</artifactId>
+            <version>5.8.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
+            <version>5.8.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-taglibs</artifactId>
+            <version>5.8.9</version>
+        </dependency>
+
         <!-- Password hashing -->
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -127,12 +148,7 @@
         </dependency>
 
         <!-- Servlet API -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>4.0.1</version>
-            <scope>provided</scope>
-        </dependency>
+
 
         <!-- Logging -->
         <dependency>
@@ -145,6 +161,82 @@
             <artifactId>logback-classic</artifactId>
             <version>1.2.12</version>
         </dependency>
+
+
+
+        <!-- Environment variables loader-->
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>java-dotenv</artifactId>
+            <version>5.2.2</version>
+        </dependency>
+
+
+
+
+
+
+        <!-- JSF (Mojarra implementation) -->
+        <!-- JSF 2.3 API (Maintains legacy javax.faces.* package names for compilation) -->
+        <!-- 1. Fixes the PostConstruct / javax.annotation errors -->
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <version>1.3.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.weld.servlet</groupId>
+            <artifactId>weld-servlet-shaded</artifactId>
+            <version>3.1.9.Final</version>
+        </dependency>
+
+        <!-- 2. Fixes the JSF / FacesContext errors (Keep these!) -->
+        <dependency>
+            <groupId>jakarta.faces</groupId>
+            <artifactId>jakarta.faces-api</artifactId>
+            <version>2.3.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.faces</artifactId>
+            <version>2.3.9</version>
+        </dependency>
+
+        <!-- CDI/EL support required by JSF outside a full Java EE container -->
+        <dependency>
+            <groupId>javax.el</groupId>
+            <artifactId>javax.el-api</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.el</artifactId>
+            <version>3.0.1-b12</version>
+        </dependency>
+
+        <!-- JSTL, used inside Facelets templates for conditional includes -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.2</version>
+        </dependency>
+
+        <!-- Password hashing -->
+
+
+        <!-- Servlet API -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+
 
 
 
@@ -171,6 +263,18 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.4.0</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven3-plugin</artifactId>
+                <version>1.10.7</version> <!-- Or a version compatible with your project -->
+                <configuration>
+                    <container>
+                        <containerId>tomcat9x</containerId> <!-- example container -->
+                        <type>embedded</type>
+                    </container>
+                </configuration>
             </plugin>
         </plugins>
     </build>

@@ -1,0 +1,42 @@
+<ui:composition template="/WEB-INF/templates/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <ui:define name="title">Apply for a Loan - Kimwanyi SACCO</ui:define>
+    <ui:define name="content">
+
+        <div class="page-header">
+            <h1>Apply for a Loan</h1>
+            <p>Loan interest is a flat 10% of the principal, repayable over 12 months.</p>
+        </div>
+
+        <h:messages globalOnly="true" layout="table" errorClass="alert alert-error" infoClass="alert alert-success"/>
+
+        <div class="card" style="max-width: 520px;">
+            <div class="payment-amount-banner">
+                <span class="label">Your maximum eligible loan (3x savings balance)</span>
+                <span class="value">UGX <h:outputText value="#{loanApplicationBean.maxEligibleAmount}"><f:convertNumber pattern="#,##0.00"/></h:outputText></span>
+            </div>
+
+            <h:form id="loanForm">
+                <input type="hidden"
+                       name="#{requestScope['_csrf'].parameterName}"
+                       value="#{requestScope['_csrf'].token}" />
+                <div class="form-group">
+                    <label for="principal">Loan Amount (UGX)</label>
+                    <h:inputText id="principal" value="#{loanApplicationBean.principalAmount}" required="true"
+                                 requiredMessage="Please enter a loan amount">
+                        <f:convertNumber/>
+                    </h:inputText>
+                    <h:message for="principal" styleClass="field-error"/>
+                    <span class="field-hint">Minimum UGX 1,000. Interest (10% flat) is added automatically to your repayment total.</span>
+                </div>
+
+                <h:commandButton value="Submit Application" action="#{loanApplicationBean.apply}"
+                                 styleClass="btn btn-primary btn-block"/>
+            </h:form>
+        </div>
+
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:sec="http://www.springframework.org/security/tags">
+<h:head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title><ui:insert name="title">Kimwanyi SACCO</ui:insert></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Poppins:wght@600;700&amp;display=swap" rel="stylesheet"/>
+    <h:outputStylesheet library="css" name="styles.css"/>
+</h:head>
+<h:body>
+    <div class="app-shell">
+
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <span class="brand-mark">K</span>
+                <span>Kimwanyi SACCO</span>
+            </div>
+
+            <div class="navbar-links">
+                <h:panelGroup rendered="#{currentUser.admin}">
+                    <a href="#{request.contextPath}/admin/dashboard.xhtml" class="nav-link">Dashboard</a>
+                    <a href="#{request.contextPath}/admin/loanReview.xhtml" class="nav-link">Loan Review</a>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{!currentUser.admin and currentUser.memberId != null}">
+                    <a href="#{request.contextPath}/member/dashboard.xhtml" class="nav-link">Dashboard</a>
+                    <a href="#{request.contextPath}/member/applyLoan.xhtml" class="nav-link">Apply for Loan</a>
+                    <a href="#{request.contextPath}/member/repayLoan.xhtml" class="nav-link">Repay Loan</a>
+                </h:panelGroup>
+            </div>
+
+            <div class="navbar-user">
+                <h:panelGroup rendered="#{currentUser.memberId != null or currentUser.admin}">
+                    <span class="role-badge">#{currentUser.admin ? 'Admin' : 'Member'}</span>
+                    <span style="color:#fff; font-size:0.88rem;">#{currentUser.fullName}</span>
+                    <form action="#{request.contextPath}/logout" method="post" style="display:inline; margin:0;">
+                        <input type="hidden" name="#{requestScope['_csrf'].parameterName}" value="#{requestScope['_csrf'].token}"/>
+                        <button type="submit" class="btn-logout">Log out</button>
+                    </form>
+                </h:panelGroup>
+            </div>
+        </nav>
+
+        <div class="main-content">
+            <ui:insert name="content">Page content goes here.</ui:insert>
+        </div>
+
+        <div class="footer">
+            &#169; 2026 Kimwanyi SACCO &#8226; Kira Municipality, Wakiso District &#8226; Built by Pahappa Limited
+        </div>
+    </div>
+</h:body>
+</html>

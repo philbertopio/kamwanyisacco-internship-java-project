@@ -1,0 +1,82 @@
+<ui:composition template="/WEB-INF/templates/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <ui:define name="title">My Dashboard - Kimwanyi SACCO</ui:define>
+    <ui:define name="content">
+
+        <div class="page-header">
+            <h1>Welcome back, #{memberDashboardBean.member.fullName}</h1>
+            <p>Membership No. #{memberDashboardBean.member.membershipNumber}</p>
+        </div>
+
+        <h:messages globalOnly="true" layout="table" errorClass="alert alert-error" infoClass="alert alert-success"/>
+
+        <div class="card-grid">
+            <div class="stat-card">
+                <div class="stat-label">Savings Balance</div>
+                <div class="stat-value">UGX <h:outputText value="#{memberDashboardBean.savingsAccount.balance}">
+                    <f:convertNumber pattern="#,##0.00"/>
+                </h:outputText></div>
+            </div>
+            <div class="stat-card accent">
+                <div class="stat-label">Minimum Balance Required</div>
+                <div class="stat-value">UGX <h:outputText value="#{memberDashboardBean.savingsAccount.minBalance}">
+                    <f:convertNumber pattern="#,##0.00"/>
+                </h:outputText></div>
+            </div>
+            <div class="stat-card #{memberDashboardBean.hasActiveLoan ? '' : 'accent'}">
+                <div class="stat-label">Loan Status</div>
+                <div class="stat-value" style="font-size:1.1rem;">
+                    #{memberDashboardBean.hasActiveLoan ? 'Active Loan' : 'No Active Loan'}
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Quick Actions</h2>
+            <div style="display:flex; gap:0.75rem; flex-wrap:wrap; margin-top:1rem;">
+                <a class="btn btn-accent" href="#{request.contextPath}/member/payment.xhtml?purpose=SAVINGS_DEPOSIT&amp;targetId=#{memberDashboardBean.savingsAccount.id}">
+                    Deposit via Mobile Money / Card
+                </a>
+                <a class="btn btn-outline" href="#{request.contextPath}/member/applyLoan.xhtml">Apply for a Loan</a>
+                <h:panelGroup rendered="#{memberDashboardBean.hasActiveLoan}">
+                    <a class="btn btn-outline" href="#{request.contextPath}/member/repayLoan.xhtml">Repay My Loan</a>
+                </h:panelGroup>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>My Loans</h2>
+            <h:panelGroup rendered="#{empty memberDashboardBean.loans}">
+                <div class="empty-state">You have no loan history yet.</div>
+            </h:panelGroup>
+            <h:panelGroup rendered="#{not empty memberDashboardBean.loans}">
+                <table class="data-table">
+                    <thead>
+                    <tr>
+                        <th>Principal</th>
+                        <th>Total Repayable</th>
+                        <th>Repaid</th>
+                        <th>Status</th>
+                        <th>Due Date</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <ui:repeat value="#{memberDashboardBean.loans}" var="loan">
+                        <tr>
+                            <td>UGX <h:outputText value="#{loan.principalAmount}"><f:convertNumber pattern="#,##0.00"/></h:outputText></td>
+                            <td>UGX <h:outputText value="#{loan.totalRepayable}"><f:convertNumber pattern="#,##0.00"/></h:outputText></td>
+                            <td>UGX <h:outputText value="#{loan.amountRepaid}"><f:convertNumber pattern="#,##0.00"/></h:outputText></td>
+                            <td><span class="badge badge-#{loan.status.toString().toLowerCase()}">#{loan.status}</span></td>
+                            <td><h:outputText value="#{loan.dueDate}"><f:convertDateTime pattern="dd MMM yyyy"/></h:outputText></td>
+                        </tr>
+                    </ui:repeat>
+                    </tbody>
+                </table>
+            </h:panelGroup>
+        </div>
+
+    </ui:define>
+</ui:composition>

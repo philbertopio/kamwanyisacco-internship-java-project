@@ -1,0 +1,176 @@
+<ui:composition template="/WEB-INF/templates/template.xhtml"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<f:metadata>
+    <f:viewParam name="purpose" value="#{paymentBean.purpose}"/>
+    <f:viewParam name="targetId" value="#{paymentBean.targetId}"/>
+</f:metadata>
+
+<ui:define name="title">Make a Payment - Kimwanyi SACCO</ui:define>
+<ui:define name="content">
+
+    <div class="page-header">
+        <h1>Make a Payment</h1>
+        <p>
+            #{paymentBean.purpose == 'SAVINGS_DEPOSIT' ? 'Depositing into your savings account' : 'Repaying your loan'}
+            &#8226; processed instantly
+        </p>
+    </div>
+
+    <h:messages globalOnly="true" layout="table" errorClass="alert alert-error" infoClass="alert alert-success"/>
+
+    <div class="card" style="max-width: 560px;">
+
+        <div class="method-tabs">
+            <div id="tabMobileMoney" class="method-tab active" onclick="showPanel('mobileMoney')">📱 Mobile Money</div>
+            <div id="tabCard" class="method-tab" onclick="showPanel('card')">💳 Card</div>
+        </div>
+
+        <!-- ================= Mobile Money panel ================= -->
+        <div id="mobileMoneyPanel">
+            <h:form id="mmForm">
+                <h:inputHidden value="#{paymentBean.purpose}"/>
+                <h:inputHidden value="#{paymentBean.targetId}"/>
+
+                <div class="form-group">
+                    <label>Provider</label>
+                    <div class="provider-select">
+                        <div class="provider-option #{paymentBean.mobileProvider == 'MTN' ? 'selected' : ''}"
+                             onclick="selectProvider('MTN')">MTN Mobile Money</div>
+                        <div class="provider-option #{paymentBean.mobileProvider == 'AIRTEL' ? 'selected' : ''}"
+                             onclick="selectProvider('AIRTEL')">Airtel Money</div>
+                    </div>
+                    <h:selectOneMenu id="mobileProviderHidden" value="#{paymentBean.mobileProvider}" style="display:none;">
+                        <f:selectItem itemValue="MTN" itemLabel="MTN"/>
+                        <f:selectItem itemValue="AIRTEL" itemLabel="AIRTEL"/>
+                    </h:selectOneMenu>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <h:inputText id="phone" value="#{paymentBean.phoneNumber}" required="true"
+                                 requiredMessage="Phone number is required" placeholder="e.g. 0772123456"/>
+                    <h:message for="phone" styleClass="field-error"/>
+                </div>
+
+                <div class="form-group">
+                    <label for="mmAmount">Amount (UGX)</label>
+                    <h:inputText id="mmAmount" value="#{paymentBean.mmAmount}" required="true"
+                                 requiredMessage="Amount is required">
+                        <f:convertNumber/>
+                    </h:inputText>
+                    <h:message for="mmAmount" styleClass="field-error"/>
+                    <span class="field-hint">Minimum UGX 500</span>
+                </div>
+
+                <h:commandButton value="Pay with Mobile Money" action="#{paymentBean.submitMobileMoney}"
+                                 styleClass="btn btn-accent btn-block"/>
+            </h:form>
+        </div>
+
+        <!-- ================= Card panel ================= -->
+        <div id="cardPanel" style="display:none;">
+            <h:form id="cardForm">
+                <h:inputHidden value="#{paymentBean.purpose}"/>
+                <h:inputHidden value="#{paymentBean.targetId}"/>
+
+                <div class="form-group">
+                    <label>Card Type</label>
+                    <div class="provider-select">
+                        <div class="provider-option #{paymentBean.cardScheme == 'VISA' ? 'selected' : ''}"
+                             onclick="selectCardScheme('VISA')">VISA</div>
+                        <div class="provider-option #{paymentBean.cardScheme == 'MASTERCARD' ? 'selected' : ''}"
+                             onclick="selectCardScheme('MASTERCARD')">Mastercard</div>
+                    </div>
+                    <h:selectOneMenu id="cardSchemeHidden" value="#{paymentBean.cardScheme}" style="display:none;">
+                        <f:selectItem itemValue="VISA" itemLabel="VISA"/>
+                        <f:selectItem itemValue="MASTERCARD" itemLabel="MASTERCARD"/>
+                    </h:selectOneMenu>
+                </div>
+
+                <div class="form-group">
+                    <label for="cardNumber">Card Number</label>
+                    <h:inputText id="cardNumber" value="#{paymentBean.cardNumber}" required="true"
+                                 requiredMessage="Card number is required" placeholder="1234 5678 9012 3456"
+                                 maxlength="19"/>
+                    <h:message for="cardNumber" styleClass="field-error"/>
+                </div>
+
+                <div class="form-group">
+                    <label for="cardHolder">Cardholder Name</label>
+                    <h:inputText id="cardHolder" value="#{paymentBean.cardHolderName}" required="true"
+                                 requiredMessage="Cardholder name is required"/>
+                    <h:message for="cardHolder" styleClass="field-error"/>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="expiryMonth">Expiry Month</label>
+                        <h:selectOneMenu id="expiryMonth" value="#{paymentBean.expiryMonth}">
+                            <f:selectItem itemValue="#{null}" itemLabel="MM"/>
+                            <f:selectItems value="#{[1,2,3,4,5,6,7,8,9,10,11,12]}"/>
+                        </h:selectOneMenu>
+                    </div>
+                    <div class="form-group">
+                        <label for="expiryYear">Expiry Year</label>
+                        <h:selectOneMenu id="expiryYear" value="#{paymentBean.expiryYear}">
+                            <f:selectItem itemValue="#{null}" itemLabel="YYYY"/>
+                            <f:selectItems value="#{paymentBean.expiryYears}"/>
+                        </h:selectOneMenu>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cvv">CVV</label>
+                    <h:inputSecret id="cvv" value="#{paymentBean.cvv}" required="true"
+                                   requiredMessage="CVV is required" maxlength="4" redisplay="true"/>
+                    <h:message for="cvv" styleClass="field-error"/>
+                </div>
+
+                <div class="form-group">
+                    <label for="cardAmount">Amount (UGX)</label>
+                    <h:inputText id="cardAmount" value="#{paymentBean.cardAmount}" required="true"
+                                 requiredMessage="Amount is required">
+                        <f:convertNumber/>
+                    </h:inputText>
+                    <h:message for="cardAmount" styleClass="field-error"/>
+                    <span class="field-hint">Minimum UGX 500. Card details are never stored in full.</span>
+                </div>
+
+                <h:commandButton value="Pay with Card" action="#{paymentBean.submitCard}"
+                                 styleClass="btn btn-accent btn-block"/>
+            </h:form>
+        </div>
+
+    </div>
+
+    <script type="text/javascript">
+        function showPanel(panel) {
+            document.getElementById('mobileMoneyPanel').style.display = panel === 'mobileMoney' ? 'block' : 'none';
+            document.getElementById('cardPanel').style.display = panel === 'card' ? 'block' : 'none';
+            document.getElementById('tabMobileMoney').classList.toggle('active', panel === 'mobileMoney');
+            document.getElementById('tabCard').classList.toggle('active', panel === 'card');
+        }
+        function selectProvider(provider) {
+            var select = document.getElementById('mmForm:mobileProviderHidden');
+            if (select) { select.value = provider; }
+            document.querySelectorAll('#mmForm .provider-option').forEach(function(el) {
+                el.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+        }
+        function selectCardScheme(scheme) {
+            var select = document.getElementById('cardForm:cardSchemeHidden');
+            if (select) { select.value = scheme; }
+            document.querySelectorAll('#cardForm .provider-option').forEach(function(el) {
+                el.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+        }
+    </script>
+
+</ui:define>
+</ui:composition>
