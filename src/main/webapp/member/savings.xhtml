@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition template="/WEB-INF/templates/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <ui:define name="title">My Savings Account - Kimwanyi SACCO</ui:define>
+
+    <ui:define name="content">
+
+        <!-- ═══════════════════════════════ PAGE HEADER ═══════════════════════════════ -->
+        <div class="page-header">
+            <h1>My Savings Account</h1>
+            <p>View your balance and perform deposits or withdrawals — processed instantly.</p>
+        </div>
+
+        <!-- Global JSF messages (success / error) -->
+        <h:messages globalOnly="true" layout="table"
+                    errorClass="alert alert-error"
+                    infoClass="alert alert-success"/>
+
+        <!-- ════════════════ ACCOUNT UNAVAILABLE GUARD ════════════════ -->
+        <h:panelGroup rendered="#{savingsBean.account == null}">
+            <div class="card">
+                <div class="empty-state">
+                    ⚠️ No savings account found for your profile.
+                    Please contact the SACCO office for assistance.
+                </div>
+            </div>
+        </h:panelGroup>
+
+        <!-- ════════════════ MAIN CONTENT (account exists) ════════════════ -->
+        <h:panelGroup rendered="#{savingsBean.account != null}">
+
+            <!-- ── ACCOUNT STATUS BANNER ───────────────────────────────────────── -->
+            <h:panelGroup rendered="#{!savingsBean.accountActive}">
+                <div class="alert alert-error">
+                    ⛔ Your savings account is currently
+                    <strong>#{savingsBean.account.status}</strong>.
+                    Transactions are suspended until your account is reactivated by an administrator.
+                </div>
+            </h:panelGroup>
+
+            <!-- ── STAT CARDS ──────────────────────────────────────────────────── -->
+            <div class="card-grid">
+
+                <!-- Current Balance -->
+                <div class="stat-card">
+                    <div class="stat-label">Current Balance</div>
+                    <div class="stat-value">
+                        UGX&#160;<h:outputText value="#{savingsBean.account.balance}">
+                            <f:convertNumber pattern="#,##0.00"/>
+                        </h:outputText>
+                    </div>
+                </div>
+
+                <!-- Available to Withdraw -->
+                <div class="stat-card accent">
+                    <div class="stat-label">Available to Withdraw</div>
+                    <div class="stat-value">
+                        UGX&#160;<h:outputText value="#{savingsBean.availableBalance}">
+                            <f:convertNumber pattern="#,##0.00"/>
+                        </h:outputText>
+                    </div>
+                </div>
+
+                <!-- Minimum Balance -->
+                <div class="stat-card">
+                    <div class="stat-label">Minimum Balance Required</div>
+                    <div class="stat-value">
+                        UGX&#160;<h:outputText value="#{savingsBean.account.minBalance}">
+                            <f:convertNumber pattern="#,##0.00"/>
+                        </h:outputText>
+                    </div>
+                </div>
+
+                <!-- Account Status -->
+                <div class="stat-card #{savingsBean.accountActive ? 'accent' : 'danger'}">
+                    <div class="stat-label">Account Status</div>
+                    <div class="stat-value" style="font-size:1.1rem; text-transform:capitalize;">
+                        <span class="badge badge-#{savingsBean.account.status.toString().toLowerCase()}">
+                            #{savingsBean.account.status}
+                        </span>
+                    </div>
+                </div>
+
+            </div><!-- /.card-grid -->
+
+            <!-- ── TRANSACTION PANELS ──────────────────────────────────────────── -->
+            <!--
+                 Both forms are wrapped in a tab switcher identical in style to the
+                 payment.xhtml "method-tabs" pattern used elsewhere in the app.
+            -->
+            <div class="card" style="max-width:600px;">
+
+                <h2 style="margin-bottom:1rem;">Make a Transaction</h2>
+
+                <!-- Tab switcher -->
+                <div class="method-tabs">
+                    <div id="tabDeposit"  class="method-tab active"
+                         onclick="showTxPanel('deposit')">
+                        ⬇&#xFE0E;&#160;Deposit
+                    </div>
+                    <div id="tabWithdraw" class="method-tab"
+                         onclick="showTxPanel('withdraw')">
+                        ⬆&#xFE0E;&#160;Withdraw
+                    </div>
+                </div>
+
+                <!-- ══════════ DEPOSIT PANEL ══════════ -->
+                <!--
+                    Calls: POST /api/v1/savings/deposit
+                    Body : { accountId, amount }  (DepositRequest)
+                    Param: processedByAdminId      (member's own ID for self-service)
+                -->
+                <div id="depositPanel">
+                    <h:panelGroup rendered="#{savingsBean.accountActive}">
+                        <h:form id="depositForm">
+                            <!-- CSRF token (Spring Security) -->
+                            <input type="hidden"
+                                   name="#{requestScope['_csrf'].parameterName}"
+                                   value="#{requestScope['_csrf'].token}"/>
+
+                            <!-- Account info banner -->
+                            <div class="payment-amount-banner">
+                                <span class="label">Account No.</span>
+                                <span class="value" style="font-size:1rem;">
+                                    ACC-<h:outputText value="#{savingsBean.account.id}"/>
+                                </span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="depositAmt">Deposit Amount (UGX)</label>
+                                <h:inputText id="depositAmt"
+                                             value="#{savingsBean.depositAmount}"
+                                             required="true"
+                                             requiredMessage="Please enter the amount to deposit."
+                                             placeholder="e.g. 50000">
+                                    <f:convertNumber/>
+                                </h:inputText>
+                                <h:message for="depositAmt" styleClass="field-error"/>
+                                <span class="field-hint">Minimum deposit: UGX 1.00</span>
+                            </div>
+
+                            <h:commandButton id="btnDeposit"
+                                             value="Confirm Deposit"
+                                             action="#{savingsBean.deposit}"
+                                             styleClass="btn btn-primary btn-block"/>
+                        </h:form>
+                    </h:panelGroup>
+
+                    <!-- Account inactive notice inside deposit panel -->
+                    <h:panelGroup rendered="#{!savingsBean.accountActive}">
+                        <div class="empty-state" style="padding:2rem 1rem;">
+                            Deposits are not available while your account is inactive.
+                        </div>
+                    </h:panelGroup>
+                </div><!-- /#depositPanel -->
+
+                <!-- ══════════ WITHDRAW PANEL ══════════ -->
+                <!--
+                    Calls: POST /api/v1/savings/withdraw
+                    Body : { accountId, amount }  (WithdrawalRequest)
+                    Param: processedByAdminId      (member's own ID for self-service)
+                -->
+                <div id="withdrawPanel" style="display:none;">
+                    <h:panelGroup rendered="#{savingsBean.accountActive}">
+                        <h:form id="withdrawForm">
+                            <!-- CSRF token (Spring Security) -->
+                            <input type="hidden"
+                                   name="#{requestScope['_csrf'].parameterName}"
+                                   value="#{requestScope['_csrf'].token}"/>
+
+                            <!-- Available balance banner -->
+                            <div class="payment-amount-banner">
+                                <span class="label">Available to Withdraw</span>
+                                <span class="value">
+                                    UGX&#160;<h:outputText value="#{savingsBean.availableBalance}">
+                                        <f:convertNumber pattern="#,##0.00"/>
+                                    </h:outputText>
+                                </span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="withdrawAmt">Withdrawal Amount (UGX)</label>
+                                <h:inputText id="withdrawAmt"
+                                             value="#{savingsBean.withdrawAmount}"
+                                             required="true"
+                                             requiredMessage="Please enter the amount to withdraw."
+                                             placeholder="e.g. 20000">
+                                    <f:convertNumber/>
+                                </h:inputText>
+                                <h:message for="withdrawAmt" styleClass="field-error"/>
+                                <span class="field-hint">
+                                    Maximum: UGX&#160;<h:outputText value="#{savingsBean.availableBalance}">
+                                        <f:convertNumber pattern="#,##0.00"/>
+                                    </h:outputText>
+                                    (balance minus minimum required)
+                                </span>
+                            </div>
+
+                            <!-- Zero-balance guard -->
+                            <h:panelGroup rendered="#{savingsBean.noFundsAvailable}">
+                                <div class="alert alert-info" style="margin-bottom:1rem;">
+                                    ℹ️ Your balance is at or below the required minimum.
+                                    No funds are available for withdrawal at this time.
+                                </div>
+                            </h:panelGroup>
+
+                            <h:commandButton id="btnWithdraw"
+                                             value="Confirm Withdrawal"
+                                             action="#{savingsBean.withdraw}"
+                                             styleClass="btn btn-danger btn-block"
+                                             disabled="#{savingsBean.noFundsAvailable}"/>
+                        </h:form>
+                    </h:panelGroup>
+
+                    <!-- Account inactive notice inside withdraw panel -->
+                    <h:panelGroup rendered="#{!savingsBean.accountActive}">
+                        <div class="empty-state" style="padding:2rem 1rem;">
+                            Withdrawals are not available while your account is inactive.
+                        </div>
+                    </h:panelGroup>
+                </div><!-- /#withdrawPanel -->
+
+            </div><!-- /.card (transaction panels) -->
+
+            <!-- ── QUICK LINKS ─────────────────────────────────────────────────── -->
+            <div class="card">
+                <h2>Other Actions</h2>
+                <div style="display:flex; gap:0.75rem; flex-wrap:wrap; margin-top:1rem;">
+                    <a class="btn btn-accent"
+                       href="#{request.contextPath}/member/payment.xhtml?purpose=SAVINGS_DEPOSIT&amp;targetId=#{savingsBean.account.id}">
+                        💳&#160;Deposit via Mobile Money / Card
+                    </a>
+                    <a class="btn btn-outline"
+                       href="#{request.contextPath}/member/dashboard.xhtml">
+                        ← Back to Dashboard
+                    </a>
+                </div>
+            </div>
+
+        </h:panelGroup><!-- /account != null -->
+
+        <!-- Tab-switch script — mirrors payment.xhtml pattern -->
+        <script type="text/javascript">
+            //<![CDATA[
+            function showTxPanel(panel) {
+                var isDeposit = (panel === 'deposit');
+                document.getElementById('depositPanel').style.display  = isDeposit ? 'block' : 'none';
+                document.getElementById('withdrawPanel').style.display = isDeposit ? 'none'  : 'block';
+                document.getElementById('tabDeposit').classList.toggle('active',  isDeposit);
+                document.getElementById('tabWithdraw').classList.toggle('active', !isDeposit);
+            }
+            //]]>
+        </script>
+
+    </ui:define>
+
+</ui:composition>

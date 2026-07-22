@@ -24,7 +24,7 @@
                         <h3 style="margin-bottom:0.25rem;">Loan #<h:outputText value="#{loan.id}"/></h3>
                         <p style="color:var(--color-text-muted); margin:0;">
                             Outstanding balance: <strong>UGX <h:outputText value="#{loan.outstandingBalance}"><f:convertNumber pattern="#,##0.00"/></h:outputText></strong>
-                            &#8226; Due <h:outputText value="#{loan.dueDate}"><f:convertDateTime pattern="dd MMM yyyy"/></h:outputText>
+                            &#8226; Due #{dateUtil.format(loan.dueDate)}
                         </p>
                     </div>
                     <a class="btn btn-accent"

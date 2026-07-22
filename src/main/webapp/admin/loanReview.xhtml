@@ -37,9 +37,12 @@
                         <td>UGX <h:outputText value="#{loan.principalAmount}"><f:convertNumber pattern="#,##0.00"/></h:outputText></td>
                         <td>UGX <h:outputText value="#{loan.interestAmount}"><f:convertNumber pattern="#,##0.00"/></h:outputText></td>
                         <td>UGX <h:outputText value="#{loan.totalRepayable}"><f:convertNumber pattern="#,##0.00"/></h:outputText></td>
-                        <td><h:outputText value="#{loan.applicationDate}"><f:convertDateTime pattern="dd MMM yyyy"/></h:outputText></td>
+                        <td>#{dateUtil.format(loan.applicationDate)}</td>
                         <td>
                             <h:form>
+                                <input type="hidden"
+                                       name="#{requestScope['_csrf'].parameterName}"
+                                       value="#{requestScope['_csrf'].token}"/>
                                 <h:commandButton value="Approve" action="#{adminLoanReviewBean.approve(loan.id)}"
                                                  styleClass="btn btn-primary btn-sm"/>
                                 <h:commandButton value="Reject" action="#{adminLoanReviewBean.reject(loan.id)}"

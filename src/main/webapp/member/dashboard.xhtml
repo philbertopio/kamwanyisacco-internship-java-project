@@ -70,7 +70,7 @@
                             <td>UGX <h:outputText value="#{loan.totalRepayable}"><f:convertNumber pattern="#,##0.00"/></h:outputText></td>
                             <td>UGX <h:outputText value="#{loan.amountRepaid}"><f:convertNumber pattern="#,##0.00"/></h:outputText></td>
                             <td><span class="badge badge-#{loan.status.toString().toLowerCase()}">#{loan.status}</span></td>
-                            <td><h:outputText value="#{loan.dueDate}"><f:convertDateTime pattern="dd MMM yyyy"/></h:outputText></td>
+                            <td>#{dateUtil.format(loan.dueDate)}</td>
                         </tr>
                     </ui:repeat>
                     </tbody>

@@ -29,6 +29,7 @@
                 </h:panelGroup>
                 <h:panelGroup rendered="#{!currentUser.admin and currentUser.memberId != null}">
                     <a href="#{request.contextPath}/member/dashboard.xhtml" class="nav-link">Dashboard</a>
+                    <a href="#{request.contextPath}/member/savings.xhtml" class="nav-link">My Savings</a>
                     <a href="#{request.contextPath}/member/applyLoan.xhtml" class="nav-link">Apply for Loan</a>
                     <a href="#{request.contextPath}/member/repayLoan.xhtml" class="nav-link">Repay Loan</a>
                 </h:panelGroup>
