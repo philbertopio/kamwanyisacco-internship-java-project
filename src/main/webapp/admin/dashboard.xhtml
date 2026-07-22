@@ -1,41 +1,458 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
 <ui:composition template="/WEB-INF/templates/template.xhtml"
-                 xmlns="http://www.w3.org/1999/xhtml"
-                 xmlns:h="http://xmlns.jcp.org/jsf/html"
-                 xmlns:f="http://xmlns.jcp.org/jsf/core"
-                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
-<ui:define name="title">Admin Dashboard - Kimwanyi SACCO</ui:define>
-<ui:define name="content">
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
-    <div class="page-header">
-        <h1>Admin Dashboard</h1>
-        <p>Overview of Kimwanyi SACCO's members, savings, and loans.</p>
-    </div>
+    <ui:define name="title">Admin Dashboard - Kimwanyi SACCO</ui:define>
 
-    <div class="card-grid">
-        <div class="stat-card">
-            <div class="stat-label">Total Members</div>
-            <div class="stat-value">#{adminDashboardBean.totalMembers}</div>
-        </div>
-        <div class="stat-card accent">
-            <div class="stat-label">Total Savings Held</div>
-            <div class="stat-value">UGX <h:outputText value="#{adminDashboardBean.totalSavingsHeld}"><f:convertNumber pattern="#,##0.00"/></h:outputText></div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Pending Loan Applications</div>
-            <div class="stat-value">#{adminDashboardBean.pendingLoansCount}</div>
-        </div>
-        <div class="stat-card danger">
-            <div class="stat-label">Overdue Loans</div>
-            <div class="stat-value">#{adminDashboardBean.overdueLoansCount}</div>
-        </div>
-    </div>
+    <ui:define name="content">
 
-    <div class="card">
-        <h2>Quick Actions</h2>
-        <div style="display:flex; gap:0.75rem; flex-wrap:wrap; margin-top:1rem;">
-            <a class="btn btn-primary" href="#{request.contextPath}/admin/loanReview.xhtml">Review Pending Loans</a>
+        <!-- ═══════════════════════ PAGE HEADER ═══════════════════════════════ -->
+        <div class="page-header">
+            <h1>Admin Dashboard</h1>
+            <p>Complete operational overview — Kimwanyi SACCO, Kira Municipality.</p>
         </div>
-    </div>
 
-</ui:define>
+        <h:messages globalOnly="true" layout="table"
+                    errorClass="alert alert-error"
+                    infoClass="alert alert-success"/>
+
+        <!-- ═══════════════════════ ROW 1: KPI CARDS ══════════════════════════ -->
+        <div class="dashboard-kpi-grid">
+
+            <!-- Members: total -->
+            <div class="stat-card">
+                <div class="stat-label">Total Members</div>
+                <div class="stat-value">#{adminDashboardBean.totalMembers}</div>
+                <div class="stat-meta">
+                    <span class="tag tag-green">+#{adminDashboardBean.newMembersThisMonth} this month</span>
+                    <span class="tag tag-red">#{adminDashboardBean.inactiveMembers} inactive</span>
+                </div>
+            </div>
+
+            <!-- Savings: total held -->
+            <div class="stat-card accent">
+                <div class="stat-label">Total Savings Held</div>
+                <div class="stat-value" style="font-size:1.25rem;">
+                    UGX&#160;<h:outputText value="#{adminDashboardBean.totalSavingsHeld}">
+                        <f:convertNumber pattern="#,##0.00"/>
+                    </h:outputText>
+                </div>
+                <div class="stat-meta">
+                    Avg&#160;<h:outputText value="#{adminDashboardBean.averageSavingsPerMember}">
+                        <f:convertNumber pattern="#,##0"/>
+                    </h:outputText>&#160;/ member
+                </div>
+            </div>
+
+            <!-- Loans: active portfolio -->
+            <div class="stat-card">
+                <div class="stat-label">Active Loan Portfolio</div>
+                <div class="stat-value" style="font-size:1.25rem;">
+                    UGX&#160;<h:outputText value="#{adminDashboardBean.totalLoanPortfolio}">
+                        <f:convertNumber pattern="#,##0.00"/>
+                    </h:outputText>
+                </div>
+                <div class="stat-meta">#{adminDashboardBean.activeLoansCount} active loans</div>
+            </div>
+
+            <!-- Pending applications -->
+            <div class="stat-card #{adminDashboardBean.pendingLoansCount > 0 ? 'accent' : ''}">
+                <div class="stat-label">Pending Applications</div>
+                <div class="stat-value">#{adminDashboardBean.pendingLoansCount}</div>
+                <div class="stat-meta">
+                    <a href="#{request.contextPath}/admin/loanReview.xhtml"
+                       style="color:var(--color-primary); font-weight:600; font-size:0.8rem;">
+                        Review now →
+                    </a>
+                </div>
+            </div>
+
+            <!-- Overdue loans -->
+            <div class="stat-card #{adminDashboardBean.overdueLoansCount > 0 ? 'danger' : ''}">
+                <div class="stat-label">Overdue Loans</div>
+                <div class="stat-value">#{adminDashboardBean.overdueLoansCount}</div>
+                <div class="stat-meta">
+                    UGX&#160;<h:outputText value="#{adminDashboardBean.totalOverdueAmount}">
+                        <f:convertNumber pattern="#,##0"/>
+                    </h:outputText>&#160;at risk
+                </div>
+            </div>
+
+            <!-- Repayment rate widget -->
+            <div class="stat-card">
+                <div class="stat-label">Repayment Collection Rate</div>
+                <div class="stat-value">#{adminDashboardBean.repaymentRatePct}%</div>
+                <div class="progress-bar-wrap">
+                    <div class="progress-bar-fill"
+                         style="width:#{adminDashboardBean.repaymentRatePct}%;
+                                background:#{adminDashboardBean.repaymentRatePct >= 70 ? 'var(--color-success)' : adminDashboardBean.repaymentRatePct >= 40 ? 'var(--color-accent)' : 'var(--color-danger)'};">
+                    </div>
+                </div>
+                <div class="stat-meta">across all loan accounts</div>
+            </div>
+
+        </div><!-- /.dashboard-kpi-grid -->
+
+        <!-- ═══════════════════ ROW 2: CHARTS ═════════════════════════════════ -->
+        <div class="dashboard-charts-row">
+
+            <!-- Chart A: Loan Status Donut -->
+            <div class="card chart-card">
+                <h2>Loan Status Breakdown</h2>
+                <p class="chart-subtitle">Distribution of all loan records by current status</p>
+                <div class="chart-wrap chart-wrap-md">
+                    <canvas id="loanStatusChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart B: Savings Balance Bracket Bar -->
+            <div class="card chart-card">
+                <h2>Savings Balance Distribution</h2>
+                <p class="chart-subtitle">Number of members per savings bracket (UGX)</p>
+                <div class="chart-wrap chart-wrap-md">
+                    <canvas id="savingsBracketChart"></canvas>
+                </div>
+            </div>
+
+        </div><!-- /.dashboard-charts-row -->
+
+        <!-- ═══════════════════ ROW 3: RISK ALERTS ════════════════════════════ -->
+        <div class="dashboard-alerts-row">
+
+            <!-- Overdue loans alert feed -->
+            <div class="card alert-feed-card">
+                <h2>🔴 Overdue Loans</h2>
+                <h:panelGroup rendered="#{empty adminDashboardBean.overdueLoans}">
+                    <div class="empty-state" style="padding:1.5rem;">
+                        ✅ No overdue loans right now.
+                    </div>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{not empty adminDashboardBean.overdueLoans}">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Loan #</th>
+                            <th>Member ID</th>
+                            <th>Outstanding</th>
+                            <th>Due Date</th>
+                            <th>Days Overdue</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <ui:repeat value="#{adminDashboardBean.overdueLoans}" var="loan">
+                            <tr>
+                                <td>#<h:outputText value="#{loan.id}"/></td>
+                                <td>#{loan.memberId}</td>
+                                <td>UGX <h:outputText value="#{loan.outstandingBalance}">
+                                    <f:convertNumber pattern="#,##0.00"/>
+                                </h:outputText></td>
+                                <td>#{dateUtil.format(loan.dueDate)}</td>
+                                <td>
+                                    <span class="badge badge-rejected">
+                                        #{adminDashboardBean.getDaysOverdue(loan)} days
+                                    </span>
+                                </td>
+                            </tr>
+                        </ui:repeat>
+                        </tbody>
+                    </table>
+                </h:panelGroup>
+            </div>
+
+            <!-- At-risk loans (due within 7 days) -->
+            <div class="card alert-feed-card">
+                <h2>🟡 At-Risk Loans <span style="font-size:0.85rem; font-weight:400;">(due within 7 days)</span></h2>
+                <h:panelGroup rendered="#{empty adminDashboardBean.atRiskLoans}">
+                    <div class="empty-state" style="padding:1.5rem;">
+                        ✅ No loans approaching their due date.
+                    </div>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{not empty adminDashboardBean.atRiskLoans}">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Loan #</th>
+                            <th>Member ID</th>
+                            <th>Outstanding</th>
+                            <th>Due Date</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <ui:repeat value="#{adminDashboardBean.atRiskLoans}" var="loan">
+                            <tr>
+                                <td>#<h:outputText value="#{loan.id}"/></td>
+                                <td>#{loan.memberId}</td>
+                                <td>UGX <h:outputText value="#{loan.outstandingBalance}">
+                                    <f:convertNumber pattern="#,##0.00"/>
+                                </h:outputText></td>
+                                <td>
+                                    <span class="badge badge-pending">#{dateUtil.format(loan.dueDate)}</span>
+                                </td>
+                            </tr>
+                        </ui:repeat>
+                        </tbody>
+                    </table>
+                </h:panelGroup>
+            </div>
+
+        </div><!-- /.dashboard-alerts-row -->
+
+        <!-- ═══════════════════ ROW 4: TELLER OPERATIONS ══════════════════════ -->
+        <div class="card">
+            <h2>Teller Operations</h2>
+            <p style="color:var(--color-text-muted); margin-bottom:1rem;">
+                Process cash deposits and withdrawals on behalf of members at the teller window.
+                Your admin ID is recorded as the authorising teller.
+            </p>
+
+            <div class="teller-panels">
+
+                <!-- Teller Deposit -->
+                <div class="teller-panel teller-deposit">
+                    <h3>⬇&#xFE0E;&#160;Teller Deposit</h3>
+                    <h:form id="tellerDepositForm">
+                        <input type="hidden"
+                               name="#{requestScope['_csrf'].parameterName}"
+                               value="#{requestScope['_csrf'].token}"/>
+                        <div class="form-group">
+                            <label for="depAccId">Account ID</label>
+                            <h:inputText id="depAccId"
+                                         value="#{adminDashboardBean.tellerAccountId}"
+                                         required="true"
+                                         requiredMessage="Account ID is required."
+                                         placeholder="e.g. 12"/>
+                            <h:message for="depAccId" styleClass="field-error"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="depAmount">Amount (UGX)</label>
+                            <h:inputText id="depAmount"
+                                         value="#{adminDashboardBean.tellerAmount}"
+                                         required="true"
+                                         requiredMessage="Amount is required."
+                                         placeholder="e.g. 100000">
+                                <f:convertNumber/>
+                            </h:inputText>
+                            <h:message for="depAmount" styleClass="field-error"/>
+                        </div>
+                        <h:commandButton value="Process Deposit"
+                                         action="#{adminDashboardBean.tellerDeposit}"
+                                         styleClass="btn btn-primary btn-block"/>
+                    </h:form>
+                </div>
+
+                <!-- Teller Withdrawal -->
+                <div class="teller-panel teller-withdraw">
+                    <h3>⬆&#xFE0E;&#160;Teller Withdrawal</h3>
+                    <h:form id="tellerWithdrawForm">
+                        <input type="hidden"
+                               name="#{requestScope['_csrf'].parameterName}"
+                               value="#{requestScope['_csrf'].token}"/>
+                        <div class="form-group">
+                            <label for="wdwAccId">Account ID</label>
+                            <h:inputText id="wdwAccId"
+                                         value="#{adminDashboardBean.tellerAccountId}"
+                                         required="true"
+                                         requiredMessage="Account ID is required."
+                                         placeholder="e.g. 12"/>
+                            <h:message for="wdwAccId" styleClass="field-error"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="wdwAmount">Amount (UGX)</label>
+                            <h:inputText id="wdwAmount"
+                                         value="#{adminDashboardBean.tellerAmount}"
+                                         required="true"
+                                         requiredMessage="Amount is required."
+                                         placeholder="e.g. 50000">
+                                <f:convertNumber/>
+                            </h:inputText>
+                            <h:message for="wdwAmount" styleClass="field-error"/>
+                        </div>
+                        <h:commandButton value="Process Withdrawal"
+                                         action="#{adminDashboardBean.tellerWithdraw}"
+                                         styleClass="btn btn-danger btn-block"/>
+                    </h:form>
+                </div>
+
+            </div><!-- /.teller-panels -->
+        </div>
+
+        <!-- ═══════════════════ ROW 5: MEMBER ROSTER ══════════════════════════ -->
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem; margin-bottom:1rem;">
+                <h2 style="margin:0;">Member Roster</h2>
+                <input id="memberSearch" type="text"
+                       oninput="filterMemberTable(this.value)"
+                       placeholder="🔍 Search by name or membership no."
+                       style="max-width:300px; padding:0.55rem 0.85rem;
+                              border:1px solid var(--color-border);
+                              border-radius:var(--radius-sm);
+                              font-size:0.88rem; font-family:inherit;"/>
+            </div>
+
+            <h:panelGroup rendered="#{empty adminDashboardBean.allMembers}">
+                <div class="empty-state">No members registered yet.</div>
+            </h:panelGroup>
+
+            <h:panelGroup rendered="#{not empty adminDashboardBean.allMembers}">
+                <div style="overflow-x:auto;">
+                    <table class="data-table" id="memberTable">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Membership No.</th>
+                            <th>Phone</th>
+                            <th>Savings Balance</th>
+                            <th>Date Joined</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <ui:repeat value="#{adminDashboardBean.allMembers}" var="m">
+                            <tr>
+                                <td><strong>#{m.fullName}</strong></td>
+                                <td style="font-size:0.82rem; color:var(--color-text-muted);">#{m.membershipNumber}</td>
+                                <td>#{m.phone}</td>
+                                <td>UGX <h:outputText value="#{adminDashboardBean.getSavingsBalanceForMember(m.id)}">
+                                    <f:convertNumber pattern="#,##0.00"/>
+                                </h:outputText></td>
+                                <td>#{dateUtil.format(m.dateJoined)}</td>
+                                <td>
+                                    <span class="badge badge-#{m.status.toString().toLowerCase()}">
+                                        #{m.status}
+                                    </span>
+                                </td>
+                                <td>
+                                    <h:form>
+                                        <input type="hidden"
+                                               name="#{requestScope['_csrf'].parameterName}"
+                                               value="#{requestScope['_csrf'].token}"/>
+                                        <h:panelGroup rendered="#{m.status.toString() == 'ACTIVE'}">
+                                            <h:commandButton
+                                                value="Deactivate"
+                                                action="#{adminDashboardBean.deactivateMember(m.id)}"
+                                                styleClass="btn btn-danger btn-sm"
+                                                onclick="return confirm('Deactivate #{m.fullName}?');"/>
+                                        </h:panelGroup>
+                                        <h:panelGroup rendered="#{m.status.toString() == 'DEACTIVATED'}">
+                                            <h:commandButton
+                                                value="Reactivate"
+                                                action="#{adminDashboardBean.reactivateMember(m.id)}"
+                                                styleClass="btn btn-primary btn-sm"/>
+                                        </h:panelGroup>
+                                    </h:form>
+                                </td>
+                            </tr>
+                        </ui:repeat>
+                        </tbody>
+                    </table>
+                </div>
+            </h:panelGroup>
+        </div>
+
+        <!-- ═══════════════════ QUICK ACTIONS ═════════════════════════════════ -->
+        <div class="card">
+            <h2>Quick Actions</h2>
+            <div style="display:flex; gap:0.75rem; flex-wrap:wrap; margin-top:1rem;">
+                <a class="btn btn-primary" href="#{request.contextPath}/admin/loanReview.xhtml">
+                    📋&#160;Review Pending Loans
+                </a>
+                <a class="btn btn-outline" href="#{request.contextPath}/register.xhtml">
+                    ➕&#160;Register New Member
+                </a>
+            </div>
+        </div>
+
+        <!-- ═══════════════════ CHART.JS + SEARCH SCRIPTS ═════════════════════ -->
+        <!-- Chart.js loaded from CDN — no build tool needed -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"
+                type="text/javascript"><!-- required placeholder --></script>
+
+        <script type="text/javascript">
+            //<![CDATA[
+
+            // ── Chart A: Loan Status Donut ────────────────────────────────────
+            (function () {
+                var loanData = #{adminDashboardBean.loanStatusChartJson};
+                var ctx = document.getElementById('loanStatusChart');
+                if (ctx) {
+                    new Chart(ctx, {
+                        type: 'doughnut',
+                        data: loanData,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: { font: { family: 'Inter', size: 12 }, padding: 16 }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(ctx) {
+                                            return ' ' + ctx.label + ': ' + ctx.raw;
+                                        }
+                                    }
+                                }
+                            },
+                            cutout: '62%'
+                        }
+                    });
+                }
+            })();
+
+            // ── Chart B: Savings Bracket Bar ─────────────────────────────────
+            (function () {
+                var savData = #{adminDashboardBean.savingsBracketChartJson};
+                var ctx = document.getElementById('savingsBracketChart');
+                if (ctx) {
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: savData,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(ctx) { return ' Members: ' + ctx.raw; }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    grid: { display: false },
+                                    ticks: { font: { family: 'Inter', size: 12 } }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: { stepSize: 1, font: { family: 'Inter', size: 12 } },
+                                    grid: { color: 'rgba(0,0,0,0.05)' }
+                                }
+                            }
+                        }
+                    });
+                }
+            })();
+
+            // ── Member table live search ──────────────────────────────────────
+            function filterMemberTable(query) {
+                var q = query.toLowerCase();
+                var rows = document.querySelectorAll('#memberTable tbody tr');
+                rows.forEach(function(row) {
+                    var text = row.textContent.toLowerCase();
+                    row.style.display = text.indexOf(q) >= 0 ? '' : 'none';
+                });
+            }
+
+            //]]>
+        </script>
+
+    </ui:define>
+
 </ui:composition>

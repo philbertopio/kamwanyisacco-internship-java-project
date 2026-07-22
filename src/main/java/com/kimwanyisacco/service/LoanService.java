@@ -23,5 +23,8 @@ public interface LoanService {
 
     /** Powers the admin loan-review screen. */
     List<LoanResponse> getPendingLoans();
+
+    /** Returns every loan record — used by the admin dashboard for aggregate analytics. */
+    List<LoanResponse> getAllLoans();
 }
 

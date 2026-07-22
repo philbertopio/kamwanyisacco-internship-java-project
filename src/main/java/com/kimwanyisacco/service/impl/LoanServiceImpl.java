@@ -182,6 +182,14 @@ public class LoanServiceImpl implements LoanService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<LoanResponse> getAllLoans() {
+        return loanRepository.findAll().stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
     private Loan findLoanOrThrow(Long loanId) {
         return loanRepository.findById(loanId)
                 .orElseThrow(() -> new ResourceNotFoundException("Loan", loanId));

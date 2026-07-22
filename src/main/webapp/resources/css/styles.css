@@ -461,11 +461,131 @@ table.data-table tr:hover td { background: #FAFCFB; }
     color: var(--color-text-muted);
 }
 
-/* ==================== Responsive ==================== */
-
 @media (max-width: 720px) {
     .navbar { padding: 0 1rem; }
     .navbar-links { display: none; }
     .form-row { grid-template-columns: 1fr; }
     .main-content { padding: 1.5rem 1rem 3rem; }
+}
+
+/* ==================== Admin Dashboard — KPI Grid ==================== */
+
+.dashboard-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 1.75rem;
+}
+
+/* Small inline meta line beneath the stat value */
+.stat-meta {
+    margin-top: 0.55rem;
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    align-items: center;
+}
+
+/* Inline coloured tags used inside stat-meta */
+.tag {
+    display: inline-block;
+    padding: 0.15rem 0.55rem;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+.tag-green { background: var(--color-success-bg); color: var(--color-success); }
+.tag-red   { background: var(--color-danger-bg);  color: var(--color-danger);  }
+.tag-gold  { background: #FEF9C3; color: #A16207; }
+
+/* Repayment-rate progress bar */
+.progress-bar-wrap {
+    height: 8px;
+    background: var(--color-border);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-top: 0.6rem;
+}
+.progress-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.4s ease;
+}
+
+/* ==================== Admin Dashboard — Charts Row ==================== */
+
+.dashboard-charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-bottom: 1.75rem;
+}
+
+.chart-card { display: flex; flex-direction: column; }
+
+.chart-subtitle {
+    color: var(--color-text-muted);
+    font-size: 0.82rem;
+    margin: 0 0 1rem 0;
+}
+
+.chart-wrap {
+    position: relative;
+    width: 100%;
+}
+.chart-wrap-md { max-height: 280px; }
+
+/* ==================== Admin Dashboard — Alerts Row ==================== */
+
+.dashboard-alerts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-bottom: 1.75rem;
+}
+
+.alert-feed-card { overflow-x: auto; }
+
+/* ==================== Admin Dashboard — Teller Panels ==================== */
+
+.teller-panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.teller-panel {
+    padding: 1.25rem 1.4rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+}
+
+.teller-deposit  { border-left: 4px solid var(--color-primary); background: #FAFCFB; }
+.teller-withdraw { border-left: 4px solid var(--color-danger);  background: #FFF8F8; }
+
+.teller-panel h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+}
+
+/* ==================== Admin Dashboard — Responsive ==================== */
+
+@media (max-width: 900px) {
+    .dashboard-charts-row,
+    .dashboard-alerts-row,
+    .teller-panels { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 720px) {
+    .dashboard-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+    .dashboard-kpi-grid { grid-template-columns: 1fr; }
 }
