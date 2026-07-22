@@ -1,22 +1,30 @@
 <!DOCTYPE html>
-<html lang="en"
-      xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html">
-<h:head>
+<html lang="en">
+<head>
     <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Access Denied - Kimwanyi SACCO</title>
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Poppins:wght@600;700&amp;display=swap" rel="stylesheet"/>
-    <h:outputStylesheet library="css" name="styles.css"/>
-</h:head>
-<h:body>
-    <div class="auth-wrapper">
-        <div class="auth-card" style="max-width: 440px; text-align:center;">
-            <div class="brand-mark" style="background:#FECACA; color:#DC2626;">!</div>
-            <h1>Access Denied</h1>
-            <p class="auth-subtitle">You don't have permission to view that page. If you think this is a mistake, please contact your SACCO administrator.</p>
-            <a href="#{request.contextPath}/index.xhtml" class="btn btn-primary btn-block">Return Home</a>
-        </div>
+    <link rel="stylesheet" href="../resources/css/styles.css"/>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #0f172a; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; }
+        .box { background:#1e293b; border:1px solid #334155; border-radius:1rem; padding:2.5rem; max-width:420px; width:90%; text-align:center; box-shadow:0 25px 50px rgba(0,0,0,.5); }
+        .icon { width:64px; height:64px; background:#fee2e2; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.8rem; margin:0 auto 1.25rem; }
+        h1 { color:#f1f5f9; font-family:'Poppins',sans-serif; font-size:1.6rem; margin:0 0 .75rem; }
+        p { color:#94a3b8; line-height:1.6; margin:0 0 1.5rem; }
+        .btn { display:block; background:linear-gradient(135deg,#4f46e5,#7c3aed); color:#fff; text-decoration:none; padding:.75rem 1.5rem; border-radius:.5rem; font-weight:600; transition:opacity .2s; }
+        .btn:hover { opacity:.85; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <div class="icon">⚠️</div>
+        <h1>Access Denied</h1>
+        <p>You don't have permission to view that page.<br/>
+           If you think this is a mistake, please contact your SACCO administrator.</p>
+        <a href="../index.xhtml" class="btn">Return Home</a>
     </div>
-</h:body>
+</body>
 </html>
+

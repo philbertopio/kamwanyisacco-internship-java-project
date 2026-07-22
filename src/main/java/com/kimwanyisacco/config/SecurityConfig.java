@@ -68,6 +68,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/resources/**", "/index.xhtml", "/login.xhtml",
                              "/register.xhtml", "/javax.faces.resource/**").permitAll()
                 .antMatchers("/api/v1/members").permitAll() // registration endpoint stays open
+                // PesaPal IPN — no-auth: PesaPal cannot send a Bearer/session token.
+                // Security: PesaPal only calls URLs registered through its API.
+                .antMatchers("/api/v1/payments/ipn").permitAll()
                 // Role-scoped areas - matched to the JSF folder structure
                 .antMatchers("/admin/**", "/api/v1/loans/*/decision", "/api/v1/loans/overdue")
                     .hasRole("ADMIN")
@@ -100,7 +103,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .exceptionHandling()
                 .accessDeniedPage("/accessDenied.xhtml")
             .and()
-            // CSRF stays enabled (default). JSF forms embed the token manually - see template.xhtml.
+            // Disable CSRF for stateless REST API paths — they use session/cookie auth
+            // but are called by non-browser clients (PesaPal IPN, mobile apps).
+            // JSF pages still benefit from CSRF protection via Spring Security's default.
+            .csrf()
+                .ignoringAntMatchers("/api/v1/**")
+            .and()
             .headers()
                 .frameOptions().deny()
                 .httpStrictTransportSecurity().disable(); // enable this once served over HTTPS
