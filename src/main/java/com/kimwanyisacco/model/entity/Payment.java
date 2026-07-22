@@ -72,4 +72,35 @@ public class Payment extends BaseEntity {
 
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
-}
+
+    // ── PesaPal v3 tracking fields ────────────────────────────────────────────
+
+    /**
+     * Unique reference we send to PesaPal as the order "id". Used to look up
+     * this Payment when PesaPal calls our IPN or callback URL.
+     * Max 50 chars: format SACCO-{memberId}-{8hex}.
+     */
+    @Column(name = "merchant_reference", length = 50, unique = true)
+    private String merchantReference;
+
+    /**
+     * PesaPal's own reference for this order, returned by SubmitOrderRequest.
+     * Required when calling GetTransactionStatus.
+     */
+    @Column(name = "order_tracking_id", length = 100)
+    private String orderTrackingId;
+
+    /**
+     * The IPN registration id that was active when this order was submitted.
+     * Stored for audit — not needed after submission.
+     */
+    @Column(name = "ipn_id", length = 100)
+    private String ipnId;
+
+    /**
+     * The redirect URL returned by PesaPal. Stored briefly so the controller
+     * can return it to the frontend. Not sensitive after payment completes.
+     */
+    @Column(name = "redirect_url", length = 512)
+    private String redirectUrl;
+}
