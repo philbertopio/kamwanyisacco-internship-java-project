@@ -219,12 +219,12 @@
                                name="#{requestScope['_csrf'].parameterName}"
                                value="#{requestScope['_csrf'].token}"/>
                         <div class="form-group">
-                            <label for="depAccId">Account ID</label>
+                            <label for="depAccId">Member ID</label>
                             <h:inputText id="depAccId"
-                                         value="#{adminDashboardBean.tellerAccountId}"
+                                         value="#{adminDashboardBean.tellerMemberId}"
                                          required="true"
-                                         requiredMessage="Account ID is required."
-                                         placeholder="e.g. 12"/>
+                                         requiredMessage="Member ID is required."
+                                         placeholder="e.g. KIM-3B1B0E03"/>
                             <h:message for="depAccId" styleClass="field-error"/>
                         </div>
                         <div class="form-group">
@@ -252,12 +252,12 @@
                                name="#{requestScope['_csrf'].parameterName}"
                                value="#{requestScope['_csrf'].token}"/>
                         <div class="form-group">
-                            <label for="wdwAccId">Account ID</label>
+                            <label for="wdwAccId">Member ID</label>
                             <h:inputText id="wdwAccId"
-                                         value="#{adminDashboardBean.tellerAccountId}"
+                                         value="#{adminDashboardBean.tellerMemberId}"
                                          required="true"
-                                         requiredMessage="Account ID is required."
-                                         placeholder="e.g. 12"/>
+                                         requiredMessage="Member ID is required."
+                                         placeholder="e.g. KIM-3B1B0E03"/>
                             <h:message for="wdwAccId" styleClass="field-error"/>
                         </div>
                         <div class="form-group">

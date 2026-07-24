@@ -35,15 +35,43 @@
         </div>
 
         <div class="card">
-            <h2>Quick Actions</h2>
-            <div style="display:flex; gap:0.75rem; flex-wrap:wrap; margin-top:1rem;">
-                <a class="btn btn-accent" href="#{request.contextPath}/member/payment.xhtml?purpose=SAVINGS_DEPOSIT&amp;targetId=#{memberDashboardBean.savingsAccount.id}">
-                    Deposit via Mobile Money / Card
-                </a>
-                <a class="btn btn-outline" href="#{request.contextPath}/member/applyLoan.xhtml">Apply for a Loan</a>
-                <h:panelGroup rendered="#{memberDashboardBean.hasActiveLoan}">
-                    <a class="btn btn-outline" href="#{request.contextPath}/member/repayLoan.xhtml">Repay My Loan</a>
-                </h:panelGroup>
+            <h2>Transaction Requests</h2>
+            <p style="color:var(--color-text-muted); margin-bottom:1rem;">
+                Submit a request below. An administrator must approve it before any balance is updated.
+            </p>
+            <div class="teller-panels">
+                <div class="teller-panel teller-deposit">
+                    <h3>Deposit to Savings</h3>
+                    <h:form id="memberDepositForm">
+                        <input type="hidden" name="#{requestScope['_csrf'].parameterName}" value="#{requestScope['_csrf'].token}"/>
+                        <div class="form-group">
+                            <label for="depositAmount">Amount (UGX)</label>
+                            <h:inputText id="depositAmount" value="#{memberDashboardBean.depositAmount}"
+                                         required="true" requiredMessage="Deposit amount is required." placeholder="e.g. 100000">
+                                <f:convertNumber/>
+                            </h:inputText>
+                            <h:message for="depositAmount" styleClass="field-error"/>
+                        </div>
+                        <h:commandButton value="Request Deposit" action="#{memberDashboardBean.requestDeposit}"
+                                         styleClass="btn btn-primary btn-block"/>
+                    </h:form>
+                </div>
+                <div class="teller-panel teller-withdraw">
+                    <h3>Withdraw from Savings</h3>
+                    <h:form id="memberWithdrawalForm">
+                        <input type="hidden" name="#{requestScope['_csrf'].parameterName}" value="#{requestScope['_csrf'].token}"/>
+                        <div class="form-group">
+                            <label for="withdrawalAmount">Amount (UGX)</label>
+                            <h:inputText id="withdrawalAmount" value="#{memberDashboardBean.withdrawalAmount}"
+                                         required="true" requiredMessage="Withdrawal amount is required." placeholder="e.g. 50000">
+                                <f:convertNumber/>
+                            </h:inputText>
+                            <h:message for="withdrawalAmount" styleClass="field-error"/>
+                        </div>
+                        <h:commandButton value="Request Withdrawal" action="#{memberDashboardBean.requestWithdrawal}"
+                                         styleClass="btn btn-danger btn-block"/>
+                    </h:form>
+                </div>
             </div>
         </div>
 
@@ -72,6 +100,28 @@
                             <td><span class="badge badge-#{loan.status.toString().toLowerCase()}">#{loan.status}</span></td>
                             <td>#{dateUtil.format(loan.dueDate)}</td>
                         </tr>
+                        <ui:fragment rendered="#{loan.status.toString() == 'ACTIVE'}">
+                            <tr>
+                                <td colspan="5">
+                                    <h:form id="loanRepaymentForm">
+                                        <input type="hidden" name="#{requestScope['_csrf'].parameterName}" value="#{requestScope['_csrf'].token}"/>
+                                        <div style="display:flex; gap:0.75rem; align-items:end; flex-wrap:wrap;">
+                                            <div class="form-group" style="margin:0; flex:1; min-width:180px;">
+                                                <label for="repaymentAmount">Manual repayment amount (UGX)</label>
+                                                <h:inputText id="repaymentAmount" value="#{memberDashboardBean.repaymentAmount}"
+                                                             required="true" requiredMessage="Repayment amount is required." placeholder="e.g. 50000">
+                                                    <f:convertNumber/>
+                                                </h:inputText>
+                                                <h:message for="repaymentAmount" styleClass="field-error"/>
+                                            </div>
+                                            <h:commandButton value="Request Repayment"
+                                                             action="#{memberDashboardBean.requestLoanRepayment(loan.id)}"
+                                                             styleClass="btn btn-primary"/>
+                                        </div>
+                                    </h:form>
+                                </td>
+                            </tr>
+                        </ui:fragment>
                     </ui:repeat>
                     </tbody>
                 </table>

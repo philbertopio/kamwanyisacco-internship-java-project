@@ -26,6 +26,7 @@
                 <h:panelGroup rendered="#{currentUser.admin}">
                     <a href="#{request.contextPath}/admin/dashboard.xhtml" class="nav-link">Dashboard</a>
                     <a href="#{request.contextPath}/admin/loanReview.xhtml" class="nav-link">Loan Review</a>
+                    <a href="#{request.contextPath}/admin/transactionReview.xhtml" class="nav-link">Transaction Review</a>
                 </h:panelGroup>
                 <h:panelGroup rendered="#{!currentUser.admin and currentUser.memberId != null}">
                     <a href="#{request.contextPath}/member/dashboard.xhtml" class="nav-link">Dashboard</a>

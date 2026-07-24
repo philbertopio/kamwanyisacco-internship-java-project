@@ -1,0 +1,55 @@
+<ui:composition template="/WEB-INF/templates/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <ui:define name="title">Transaction Requests - Kimwanyi SACCO</ui:define>
+    <ui:define name="content">
+        <div class="page-header">
+            <h1>Pending Transaction Requests</h1>
+            <p>Approve or reject member-submitted savings and loan repayment requests.</p>
+        </div>
+
+        <h:messages globalOnly="true" layout="table" errorClass="alert alert-error" infoClass="alert alert-success"/>
+
+        <div class="card">
+            <h:panelGroup rendered="#{empty adminTransactionReviewBean.pendingRequests}">
+                <div class="empty-state">No member transaction requests are waiting for review.</div>
+            </h:panelGroup>
+            <h:panelGroup rendered="#{not empty adminTransactionReviewBean.pendingRequests}">
+                <table class="data-table">
+                    <thead>
+                    <tr>
+                        <th>Member ID</th>
+                        <th>Transaction</th>
+                        <th>Target</th>
+                        <th>Amount</th>
+                        <th>Requested</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <ui:repeat value="#{adminTransactionReviewBean.pendingRequests}" var="transactionRequest">
+                        <tr>
+                            <td>#{transactionRequest.membershipNumber}</td>
+                            <td>#{transactionRequest.transactionType}</td>
+                            <td>#{transactionRequest.loanId != null ? 'Loan #'.concat(transactionRequest.loanId) : 'Savings account #'.concat(transactionRequest.savingsAccountId)}</td>
+                            <td>UGX <h:outputText value="#{transactionRequest.amount}"><f:convertNumber pattern="#,##0.00"/></h:outputText></td>
+                            <td>#{transactionRequest.requestedAt}</td>
+                            <td>
+                                <h:form>
+                                    <input type="hidden" name="#{requestScope['_csrf'].parameterName}" value="#{requestScope['_csrf'].token}"/>
+                                    <h:commandButton value="Approve" action="#{adminTransactionReviewBean.approve(transactionRequest.id)}"
+                                                     styleClass="btn btn-primary btn-sm"/>
+                                    <h:commandButton value="Reject" action="#{adminTransactionReviewBean.reject(transactionRequest.id)}"
+                                                     styleClass="btn btn-danger btn-sm" style="margin-left:0.4rem;"/>
+                                </h:form>
+                            </td>
+                        </tr>
+                    </ui:repeat>
+                    </tbody>
+                </table>
+            </h:panelGroup>
+        </div>
+    </ui:define>
+</ui:composition>

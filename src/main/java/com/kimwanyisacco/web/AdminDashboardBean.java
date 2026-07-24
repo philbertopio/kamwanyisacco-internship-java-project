@@ -76,7 +76,8 @@ public class AdminDashboardBean {
     private String savingsBracketChartJson;
 
     // ── teller action fields (deposit / withdraw on behalf of member) ─────────
-    private Long tellerAccountId;
+    /** Membership number entered by the teller, e.g. KIM-3B1B0E03. */
+    private String tellerMemberId;
     private BigDecimal tellerAmount;
 
     @Autowired
@@ -169,7 +170,7 @@ public class AdminDashboardBean {
     public String tellerDeposit() {
         FacesContext ctx = FacesContext.getCurrentInstance();
         try {
-            DepositRequest req = new DepositRequest(tellerAccountId, tellerAmount);
+            DepositRequest req = new DepositRequest(resolveTellerAccountId(), tellerAmount);
             savingsService.deposit(req, currentUser.getAdminId());
             ctx.getExternalContext().getFlash().setKeepMessages(true);
             ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -189,7 +190,7 @@ public class AdminDashboardBean {
     public String tellerWithdraw() {
         FacesContext ctx = FacesContext.getCurrentInstance();
         try {
-            WithdrawalRequest req = new WithdrawalRequest(tellerAccountId, tellerAmount);
+            WithdrawalRequest req = new WithdrawalRequest(resolveTellerAccountId(), tellerAmount);
             savingsService.withdraw(req, currentUser.getAdminId());
             ctx.getExternalContext().getFlash().setKeepMessages(true);
             ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -203,6 +204,28 @@ public class AdminDashboardBean {
                     "Withdrawal failed: " + ex.getMessage(), null));
             return null;
         }
+    }
+
+    /**
+     * Resolves the human-facing membership number to the internal savings-account ID.
+     * Transaction services continue to receive account IDs, preserving their existing
+     * balance, minimum-balance, authorization, and audit rules.
+     */
+    private Long resolveTellerAccountId() {
+        String membershipNumber = tellerMemberId == null ? "" : tellerMemberId.trim();
+        MemberResponse member = allMembers.stream()
+                .filter(candidate -> candidate.getMembershipNumber() != null
+                        && candidate.getMembershipNumber().equalsIgnoreCase(membershipNumber))
+                .findFirst()
+                .orElseThrow(() -> new BusinessRuleViolationException(
+                        "No member was found with ID " + membershipNumber + "."));
+
+        return allAccounts.stream()
+                .filter(account -> member.getId().equals(account.getMemberId()))
+                .map(SavingsAccountResponse::getId)
+                .findFirst()
+                .orElseThrow(() -> new BusinessRuleViolationException(
+                        "Member " + membershipNumber + " does not have a savings account."));
     }
 
     /** Deactivates a member account. */
