@@ -23,7 +23,7 @@ pipeline {
 
         // Source
         GIT_REPO_URL    = "https://github.com/kamwanyisacco/kamwanyisacco-internship-java-project.git"
-        GIT_BRANCH      = "deploy"
+        GIT_BRANCH      = "ft_deploy"
 
         // MySQL image
         MYSQL_IMAGE     = "docker.io/library/mysql:8.0"
