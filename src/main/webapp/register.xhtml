@@ -10,82 +10,174 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Poppins:wght@600;700&amp;display=swap" rel="stylesheet"/>
     <h:outputStylesheet library="css" name="styles.css"/>
+    <style>
+        /* page-scoped overrides for the wider register card */
+        .auth-card { max-width: 560px; }
+    </style>
 </h:head>
 <h:body>
     <div class="auth-wrapper">
-        <div class="auth-card" style="max-width: 520px;">
+        <div class="auth-card">
             <div class="brand-mark">K</div>
             <h1>Create your account</h1>
-            <p class="auth-subtitle">Join Kimwanyi SACCO - savings and loans made easy</p>
+            <p class="auth-subtitle">Join Kimwanyi SACCO – savings and loans made easy</p>
 
-            <h:messages globalOnly="true" layout="table" errorClass="alert alert-error" infoClass="alert alert-success"/>
+            <!-- Global server messages (success / duplicate / unexpected error) -->
+            <h:messages globalOnly="true" layout="table"
+                        errorClass="alert alert-error"
+                        infoClass="alert alert-success"/>
 
-            <h:form id="registerForm">
+            <h:form id="registerForm" novalidate="novalidate">
 
+                <!-- Spring Security CSRF token -->
                 <input type="hidden"
                        name="#{requestScope['_csrf'].parameterName}"
                        value="#{requestScope['_csrf'].token}" />
+
+                <!-- ── Row 1: Full Name + National ID ── -->
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="fullName">Full Name</label>
-                        <h:inputText id="fullName" value="#{registrationBean.fullName}" required="true"
-                                     requiredMessage="Full name is required"/>
-                        <h:message for="fullName" styleClass="field-error"/>
+                        <label for="fullName">Full Name <span style="color:var(--color-danger)">*</span></label>
+                        <h:inputText id="fullName"
+                                     value="#{registrationBean.fullName}"
+                                     required="true"
+                                     requiredMessage="Full name is required"
+                                     validatorMessage="Enter your full legal name (2–150 characters)"
+                                     maxlength="150"
+                                     autocomplete="name">
+                            <f:validateLength minimum="2" maximum="150"/>
+                        </h:inputText>
+                        <span class="field-hint">As it appears on your national ID</span>
+                        <h:message for="fullName" styleClass="field-error" role="alert"/>
                     </div>
+
                     <div class="form-group">
-                        <label for="nationalId">National ID</label>
-                        <h:inputText id="nationalId" value="#{registrationBean.nationalId}" required="true"
-                                     requiredMessage="National ID is required"/>
-                        <h:message for="nationalId" styleClass="field-error"/>
+                        <label for="nationalId">National ID <span style="color:var(--color-danger)">*</span></label>
+                        <h:inputText id="nationalId"
+                                     value="#{registrationBean.nationalId}"
+                                     required="true"
+                                     requiredMessage="National ID number is required"
+                                     validatorMessage="National ID must be 6–20 alphanumeric characters (letters and digits only)"
+                                     maxlength="20"
+                                     autocomplete="off">
+                            <f:validateRegex pattern="^[A-Za-z0-9]{6,20}$"/>
+                        </h:inputText>
+                        <span class="field-hint">6–20 letters and digits, no spaces or symbols</span>
+                        <h:message for="nationalId" styleClass="field-error" role="alert"/>
                     </div>
                 </div>
 
+                <!-- ── Row 2: Username + Email ── -->
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="username">Username</label>
-                        <h:inputText id="username" value="#{registrationBean.username}" required="true"
-                                     requiredMessage="Username is required"/>
-                        <h:message for="username" styleClass="field-error"/>
+                        <label for="username">Username <span style="color:var(--color-danger)">*</span></label>
+                        <h:inputText id="username"
+                                     value="#{registrationBean.username}"
+                                     required="true"
+                                     requiredMessage="Username is required"
+                                     validatorMessage="Username must be 4–50 characters: letters, digits, underscores or hyphens only"
+                                     maxlength="50"
+                                     autocomplete="username">
+                            <f:validateRegex pattern="^[A-Za-z0-9_\-]{4,50}$"/>
+                        </h:inputText>
+                        <span class="field-hint">4–50 characters, letters/digits/_ or – only</span>
+                        <h:message for="username" styleClass="field-error" role="alert"/>
                     </div>
+
                     <div class="form-group">
-                        <label for="email">Email</label>
-                        <h:inputText id="email" value="#{registrationBean.email}" required="true"
-                                     requiredMessage="Email is required"/>
-                        <h:message for="email" styleClass="field-error"/>
+                        <label for="email">Email Address <span style="color:var(--color-danger)">*</span></label>
+                        <h:inputText id="email"
+                                     value="#{registrationBean.email}"
+                                     required="true"
+                                     requiredMessage="Email address is required"
+                                     validatorMessage="Please enter a valid email address (e.g. name@example.com)"
+                                     maxlength="255"
+                                     autocomplete="email">
+                            <f:validateRegex pattern="^[^\s@]+@[^\s@]+\.[^\s@]{2,}$"/>
+                        </h:inputText>
+                        <span class="field-hint">We will send account notifications here</span>
+                        <h:message for="email" styleClass="field-error" role="alert"/>
                     </div>
                 </div>
 
+                <!-- ── Row 3: Password + Confirm ── -->
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="password">Password</label>
-                        <h:inputSecret id="password" value="#{registrationBean.password}" required="true"
-                                       requiredMessage="Password is required"/>
-                        <span class="field-hint">At least 8 characters</span>
-                        <h:message for="password" styleClass="field-error"/>
+                        <label for="password">Password <span style="color:var(--color-danger)">*</span></label>
+                        <h:inputSecret id="password"
+                                       value="#{registrationBean.password}"
+                                       required="true"
+                                       requiredMessage="Password is required"
+                                       validatorMessage="Password must be at least 8 characters and include uppercase, lowercase, a digit, and a special character"
+                                       maxlength="128"
+                                       autocomplete="new-password">
+                            <f:validateRegex pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,128}$"/>
+                        </h:inputSecret>
+
+                        <!-- Live strength meter (purely visual, driven by JS) -->
+                        <div class="pw-strength-wrap" id="pwStrengthWrap" style="display:none">
+                            <div class="pw-strength-bar">
+                                <div class="pw-strength-fill" id="pwStrengthFill"></div>
+                            </div>
+                            <span class="pw-strength-label" id="pwStrengthLabel"></span>
+                        </div>
+
+                        <!-- Requirement checklist -->
+                        <ul class="pw-requirements" id="pwReqs" style="display:none">
+                            <li id="req-len">At least 8 characters</li>
+                            <li id="req-upper">Uppercase letter</li>
+                            <li id="req-lower">Lowercase letter</li>
+                            <li id="req-digit">Number (0–9)</li>
+                            <li id="req-special">Special character</li>
+                        </ul>
+
+                        <h:message for="password" styleClass="field-error" role="alert"/>
                     </div>
+
                     <div class="form-group">
-                        <label for="confirmPassword">Confirm Password</label>
-                        <h:inputSecret id="confirmPassword" value="#{registrationBean.confirmPassword}" required="true"
-                                       requiredMessage="Please confirm your password"/>
-                        <h:message for="confirmPassword" styleClass="field-error"/>
+                        <label for="confirmPassword">Confirm Password <span style="color:var(--color-danger)">*</span></label>
+                        <h:inputSecret id="confirmPassword"
+                                       value="#{registrationBean.confirmPassword}"
+                                       required="true"
+                                       requiredMessage="Please confirm your password"
+                                       maxlength="128"
+                                       autocomplete="new-password"/>
+                        <span class="field-hint" id="confirmHint" style="display:none; color:var(--color-danger)">Passwords do not match</span>
+                        <h:message for="confirmPassword" styleClass="field-error" role="alert"/>
                     </div>
                 </div>
 
+                <!-- ── Row 4: Phone + Address ── -->
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="phone">Phone Number</label>
-                        <h:inputText id="phone" value="#{registrationBean.phone}" required="true"
-                                     requiredMessage="Phone number is required"/>
-                        <h:message for="phone" styleClass="field-error"/>
+                        <label for="phone">Phone Number <span style="color:var(--color-danger)">*</span></label>
+                        <h:inputText id="phone"
+                                     value="#{registrationBean.phone}"
+                                     required="true"
+                                     requiredMessage="Phone number is required"
+                                     validatorMessage="Enter a valid phone number (e.g. +254712345678 or 0712345678)"
+                                     maxlength="15"
+                                     autocomplete="tel">
+                            <f:validateRegex pattern="^\+?[0-9]{9,15}$"/>
+                        </h:inputText>
+                        <span class="field-hint">Format: +254712345678 or 0712345678</span>
+                        <h:message for="phone" styleClass="field-error" role="alert"/>
                     </div>
+
                     <div class="form-group">
-                        <label for="address">Address (optional)</label>
-                        <h:inputText id="address" value="#{registrationBean.address}"/>
+                        <label for="address">Address <span class="field-hint" style="display:inline; margin:0; font-style:italic">(optional)</span></label>
+                        <h:inputText id="address"
+                                     value="#{registrationBean.address}"
+                                     maxlength="255"
+                                     autocomplete="street-address"/>
+                        <span class="field-hint">Town, estate or postal address</span>
                     </div>
                 </div>
 
-                <h:commandButton value="Create Account" action="#{registrationBean.register}"
-                                 styleClass="btn btn-primary btn-block"/>
+                <h:commandButton value="Create Account"
+                                 action="#{registrationBean.register}"
+                                 styleClass="btn btn-primary btn-block"
+                                 style="margin-top:0.5rem"/>
             </h:form>
 
             <div class="auth-footer">
@@ -93,5 +185,135 @@
             </div>
         </div>
     </div>
+
+    <script>//<![CDATA[
+    (function () {
+        "use strict";
+
+        function getInput(jsfId) {
+            return document.getElementById("registerForm:" + jsfId);
+        }
+
+        var pwInput      = getInput("password");
+        var cpInput      = getInput("confirmPassword");
+        var strengthWrap = document.getElementById("pwStrengthWrap");
+        var strengthFill = document.getElementById("pwStrengthFill");
+        var strengthLbl  = document.getElementById("pwStrengthLabel");
+        var reqList      = document.getElementById("pwReqs");
+        var confirmHint  = document.getElementById("confirmHint");
+
+        var levels      = ["weak","fair","good","strong"];
+        var levelLabels = ["Weak","Fair","Good","Strong"];
+
+        function scorePassword(pw) {
+            var score = 0;
+            if (pw.length >= 8)           score++;
+            if (/[A-Z]/.test(pw))         score++;
+            if (/[a-z]/.test(pw))         score++;
+            if (/[0-9]/.test(pw))         score++;
+            if (/[^A-Za-z0-9]/.test(pw))  score++;
+            return score;
+        }
+
+        function setReq(id, met) {
+            var el = document.getElementById(id);
+            if (el) { el.className = met ? "met" : ""; }
+        }
+
+        function updateStrength() {
+            var pw = pwInput ? pwInput.value : "";
+            if (!pw) {
+                strengthWrap.style.display = "none";
+                reqList.style.display = "none";
+                return;
+            }
+            strengthWrap.style.display = "block";
+            reqList.style.display = "grid";
+
+            setReq("req-len",     pw.length >= 8);
+            setReq("req-upper",   /[A-Z]/.test(pw));
+            setReq("req-lower",   /[a-z]/.test(pw));
+            setReq("req-digit",   /[0-9]/.test(pw));
+            setReq("req-special", /[^A-Za-z0-9]/.test(pw));
+
+            var score = Math.min(scorePassword(pw), 4) - 1;
+            if (score < 0) { score = 0; }
+            var level = levels[score];
+            var label = levelLabels[score];
+
+            strengthFill.className  = "pw-strength-fill " + level;
+            strengthLbl.className   = "pw-strength-label " + level;
+            strengthLbl.textContent = label + " password";
+
+            checkMatch();
+        }
+
+        function checkMatch() {
+            if (!cpInput || !cpInput.value) { confirmHint.style.display = "none"; return; }
+            var match = (pwInput.value === cpInput.value);
+            confirmHint.style.display = match ? "none" : "block";
+            cpInput.setAttribute("aria-invalid", match ? "false" : "true");
+            cpInput.className = match ? "input-valid" : "input-invalid";
+        }
+
+        if (pwInput) {
+            pwInput.addEventListener("input", updateStrength);
+            pwInput.addEventListener("focus", function () {
+                if (pwInput.value) { updateStrength(); }
+                else { reqList.style.display = "grid"; }
+            });
+        }
+        if (cpInput) { cpInput.addEventListener("input", checkMatch); }
+
+        var reNationalId = new RegExp("^[A-Za-z0-9]{6,20}$");
+        var reUsername   = new RegExp("^[A-Za-z0-9_\\-]{4,50}$");
+        var reEmail      = new RegExp("^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$");
+        var rePhone      = new RegExp("^\\+?[0-9]{9,15}$");
+
+        var rules = {
+            "fullName":   { min: 2 },
+            "nationalId": { re: reNationalId },
+            "username":   { re: reUsername },
+            "email":      { re: reEmail },
+            "phone":      { re: rePhone }
+        };
+
+        Object.keys(rules).forEach(function (fieldId) {
+            var input = getInput(fieldId);
+            if (!input) { return; }
+            var rule = rules[fieldId];
+
+            input.addEventListener("blur", function () {
+                var val   = input.value.trim();
+                var valid = true;
+                if (!val) {
+                    valid = false;
+                } else if (rule.re && !rule.re.test(val)) {
+                    valid = false;
+                } else if (rule.min && val.length < rule.min) {
+                    valid = false;
+                }
+                input.className = valid ? "input-valid" : "input-invalid";
+                input.setAttribute("aria-invalid", valid ? "false" : "true");
+            });
+
+            input.addEventListener("focus", function () {
+                input.className = "";
+                input.removeAttribute("aria-invalid");
+            });
+        });
+
+        var form = document.getElementById("registerForm");
+        if (form) {
+            form.addEventListener("submit", function (e) {
+                if (pwInput && cpInput && pwInput.value !== cpInput.value) {
+                    e.preventDefault();
+                    confirmHint.style.display = "block";
+                    cpInput.focus();
+                }
+            });
+        }
+    })();
+    //]]></script>
 </h:body>
 </html>
