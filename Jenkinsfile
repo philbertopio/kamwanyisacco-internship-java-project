@@ -44,18 +44,16 @@ pipeline {
         // 2. Unit / integration tests
         stage('Test') {
             tools {
-                maven 'maven3'   // must match the name set in Jenkins → Tools
+                maven 'maven3'
             }
             steps {
-                dir('kamwanyisacco-internship-java-project') {
-                    echo "Running Maven tests..."
-                    sh 'mvn test -B'
-                }
+                echo "Running Maven tests..."
+                sh 'mvn test -B'
             }
             post {
                 always {
                     junit allowEmptyResults: true,
-                          testResults: 'kamwanyisacco-internship-java-project/target/surefire-reports/*.xml'
+                          testResults: 'target/surefire-reports/*.xml'
                 }
             }
         }
@@ -63,17 +61,15 @@ pipeline {
         // 3. Build Podman image
         stage('Build Image') {
             steps {
-                dir('kamwanyisacco-internship-java-project') {
-                    echo "Building Podman image ${IMAGE_NAME}:${IMAGE_TAG}..."
-                    sh """
-                        podman build \\
-                            -f Containerfile \\
-                            -t ${IMAGE_NAME}:${IMAGE_TAG} \\
-                            --label "build.number=${BUILD_NUMBER}" \\
-                            --label "git.commit=${GIT_COMMIT}" \\
-                            .
-                    """
-                }
+                echo "Building Podman image ${IMAGE_NAME}:${IMAGE_TAG}..."
+                sh """
+                    podman build \\
+                        -f Containerfile \\
+                        -t ${IMAGE_NAME}:${IMAGE_TAG} \\
+                        --label "build.number=${BUILD_NUMBER}" \\
+                        --label "git.commit=${GIT_COMMIT}" \\
+                        .
+                """
             }
         }
 
