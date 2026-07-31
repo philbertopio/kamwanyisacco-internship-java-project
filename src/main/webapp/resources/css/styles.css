@@ -313,6 +313,101 @@ input:focus, select:focus, textarea:focus {
     display: block;
 }
 
+/* ==================== Input validation states ==================== */
+
+input.input-invalid,
+input[aria-invalid="true"] {
+    border-color: var(--color-danger) !important;
+    box-shadow: 0 0 0 3px rgba(220,38,38,0.12) !important;
+}
+
+input.input-valid {
+    border-color: var(--color-success);
+    box-shadow: 0 0 0 3px rgba(22,163,74,0.10);
+}
+
+.form-group {
+    position: relative;
+}
+
+/* Inline hint shown below the input */
+.field-hint {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    margin-top: 0.28rem;
+    display: block;
+}
+
+/* Small format guide toggled via JS */
+.field-format-hint {
+    font-size: 0.76rem;
+    color: var(--color-text-muted);
+    margin-top: 0.25rem;
+    display: block;
+    font-style: italic;
+}
+
+/* Password strength bar */
+.pw-strength-wrap {
+    margin-top: 0.45rem;
+}
+.pw-strength-bar {
+    height: 5px;
+    border-radius: 99px;
+    background: var(--color-border);
+    overflow: hidden;
+    margin-bottom: 0.22rem;
+}
+.pw-strength-fill {
+    height: 100%;
+    border-radius: 99px;
+    width: 0;
+    transition: width 0.3s, background 0.3s;
+}
+.pw-strength-fill.weak   { width: 25%; background: var(--color-danger); }
+.pw-strength-fill.fair   { width: 50%; background: #F97316; }
+.pw-strength-fill.good   { width: 75%; background: var(--color-accent); }
+.pw-strength-fill.strong { width: 100%; background: var(--color-success); }
+
+.pw-strength-label {
+    font-size: 0.73rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+}
+.pw-strength-label.weak   { color: var(--color-danger); }
+.pw-strength-label.fair   { color: #F97316; }
+.pw-strength-label.good   { color: var(--color-accent-dark); }
+.pw-strength-label.strong { color: var(--color-success); }
+
+/* Requirements checklist */
+.pw-requirements {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 0 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.15rem 0.5rem;
+}
+.pw-requirements li {
+    font-size: 0.74rem;
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+.pw-requirements li::before {
+    content: "○";
+    font-size: 0.7rem;
+    color: var(--color-border);
+}
+.pw-requirements li.met {
+    color: var(--color-success);
+}
+.pw-requirements li.met::before {
+    content: "✓";
+    color: var(--color-success);
+}
+
 /* ==================== Buttons ==================== */
 
 .btn {
