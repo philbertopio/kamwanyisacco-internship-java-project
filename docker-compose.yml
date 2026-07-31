@@ -1,0 +1,90 @@
+
+
+version: "3.9"
+
+services:
+
+  # MySQL 8
+  sacco-mysql:
+    image: docker.io/library/mysql:8.0
+    container_name: sacco-mysql
+    restart: unless-stopped
+
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE:      ${DB_NAME}
+      MYSQL_USER:          ${DB_USERNAME}
+      MYSQL_PASSWORD:      ${DB_PASSWORD}
+
+    volumes:
+      # Persist data across container restarts
+      - sacco_mysql_data:/var/lib/mysql
+      # Optional: place any *.sql init scripts in ./db/init/
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+
+    ports:
+      # Expose only on localhost; remove this block if external access is not needed
+      - "127.0.0.1:3306:3306"
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost",
+             "-u", "${DB_USERNAME}", "--password=${DB_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+    networks:
+      - sacco-net
+
+  #Kimwanyi SACCO app (Tomcat)
+  sacco-app:
+    image: kimwanyisacco:latest        # built by Jenkins / podman build
+    container_name: sacco-app
+    restart: unless-stopped
+
+    depends_on:
+      sacco-mysql:
+        condition: service_healthy
+
+    environment:
+      # Database – passed through to application.properties via java-dotenv / env vars
+      DB_HOST:     sacco-mysql
+      DB_PORT:     "3306"
+      DB_NAME:     ${DB_NAME}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+
+      # PesaPal payment gateway
+      PESAPAL_CONSUMER_KEY:    ${PESAPAL_CONSUMER_KEY}
+      PESAPAL_CONSUMER_SECRET: ${PESAPAL_CONSUMER_SECRET}
+      PESAPAL_BASE_URL:        ${PESAPAL_BASE_URL}
+      PESAPAL_CALLBACK_URL:    ${PESAPAL_CALLBACK_URL}
+      PESAPAL_IPN_URL:         ${PESAPAL_IPN_URL}
+
+      # Business settings
+      PAYMENT_CURRENCY: ${PAYMENT_CURRENCY}
+      BUSINESS_NAME:    ${BUSINESS_NAME}
+
+    ports:
+      - "${APP_PORT:-8080}:8080"
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/KimwanyiSacco/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+    networks:
+      - sacco-net
+
+# Named volumes
+volumes:
+  sacco_mysql_data:
+    driver: local
+
+# Internal bridge network
+networks:
+  sacco-net:
+    driver: bridge
