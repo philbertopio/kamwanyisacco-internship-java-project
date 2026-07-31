@@ -22,7 +22,7 @@ pipeline {
         PODMAN_NETWORK  = "sacco-net"
 
         // Source
-        GIT_REPO_URL    = "https://github.com/kamwanyisacco/kamwanyisacco-internship-java-project.git"
+        GIT_REPO_URL    = "https://github.com/philbertopio/kamwanyisacco-internship-java-project.git"
         GIT_BRANCH      = "ft_deploy"
 
         // MySQL image
