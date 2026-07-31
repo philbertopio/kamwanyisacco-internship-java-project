@@ -1,6 +1,6 @@
 
 pipeline {
-    agent { label 'host-server' }
+    agent { label 'agent any' }
 
     // Global environment
     environment {
