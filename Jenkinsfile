@@ -104,7 +104,7 @@ pipeline {
                 withCredentials([file(credentialsId: 'sacco-env-file', variable: 'ENV_FILE')]) {
                     sh """
                         # Parse only the DB-related vars we need
-                        set -a; source "\${ENV_FILE}"; set +a
+                        set -a; . "\${ENV_FILE}"; set +a
 
                         podman run -d \\
                             --name  ${DB_CONTAINER} \\
@@ -144,7 +144,7 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: 'sacco-env-file', variable: 'ENV_FILE')]) {
                     sh """
-                        set -a; source "\${ENV_FILE}"; set +a
+                        set -a; . "\${ENV_FILE}"; set +a
 
                         podman run -d \\
                             --name  ${APP_CONTAINER} \\
