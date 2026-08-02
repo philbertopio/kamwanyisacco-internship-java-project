@@ -11,6 +11,31 @@ env:
   REGISTRY: ghcr.io
 
 jobs:
+
+  mirror-mysql:
+    name: Mirror MySQL Image to GHCR
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Lowercase repo owner for image tag
+        id: owner
+        run: echo "owner=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
+
+      - name: Pull, retag and push MySQL
+        run: |
+          docker pull mysql:8.0
+          docker tag mysql:8.0 ghcr.io/${{ steps.owner.outputs.owner }}/mysql-mirror:8.0
+          docker push ghcr.io/${{ steps.owner.outputs.owner }}/mysql-mirror:8.0
+
   build-and-push:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
