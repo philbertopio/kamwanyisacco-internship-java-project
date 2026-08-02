@@ -122,10 +122,10 @@ jobs:
       - name: Smoke test
         run: |
           sleep 20
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.SERVER_HOST }}:8080/)
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.SERVER_HOST }}:10080/)
           echo "HTTP status: $HTTP_STATUS"
           if [ "$HTTP_STATUS" -eq 200 ] || [ "$HTTP_STATUS" -eq 302 ]; then
-            echo "✅ Site is live at http://${{ secrets.SERVER_HOST }}:8080"
+            echo "✅ Site is live at http://${{ secrets.SERVER_HOST }}:10080"
           else
             echo "❌ Smoke test failed — HTTP $HTTP_STATUS"
             exit 1

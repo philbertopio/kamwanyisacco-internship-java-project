@@ -38,7 +38,7 @@ services:
       PAYMENT_CURRENCY: ${PAYMENT_CURRENCY}
       BUSINESS_NAME: ${BUSINESS_NAME}
     ports:
-      - "8080:8080"
+      - "10080:8080"
     networks:
       - app-network
 
