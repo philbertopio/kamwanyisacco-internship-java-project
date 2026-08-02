@@ -11,7 +11,6 @@ env:
   REGISTRY: ghcr.io
 
 jobs:
-
   mirror-mysql:
     name: Mirror MySQL Image to GHCR
     runs-on: ubuntu-latest
@@ -73,7 +72,7 @@ jobs:
 
   deploy:
     name: Deploy to Server
-    needs: build-and-push
+    needs: [mirror-mysql, build-and-push]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -104,10 +103,11 @@ jobs:
 
             cat > .env << 'ENVEOF'
             IMAGE_NAME=ghcr.io/${{ steps.owner.outputs.owner }}/${{ env.IMAGE_NAME }}
+            MYSQL_IMAGE=ghcr.io/${{ steps.owner.outputs.owner }}/mysql-mirror:8.0
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             ENVEOF
 
-            podman-compose pull app
+            podman-compose pull
             podman-compose up -d
             podman image prune -f
             echo "✅ Deployment complete"
