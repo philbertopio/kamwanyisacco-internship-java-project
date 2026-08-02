@@ -70,9 +70,9 @@ jobs:
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             ENVEOF
 
-            docker compose pull app
-            docker compose up -d
-            docker image prune -f
+            podman compose pull app
+            podman compose up -d
+            podman image prune -f
             echo "✅ Deployment complete"
 
       - name: Smoke test
