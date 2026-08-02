@@ -30,6 +30,13 @@ services:
       DB_URL: jdbc:mysql://mysql:3306/kimwanyi_sacco?useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true
       DB_USERNAME: root
       DB_PASSWORD: ${DB_PASSWORD}
+      PESAPAL_CONSUMER_KEY: ${PESAPAL_CONSUMER_KEY}
+      PESAPAL_CONSUMER_SECRET: ${PESAPAL_CONSUMER_SECRET}
+      PESAPAL_BASE_URL: ${PESAPAL_BASE_URL}
+      PESAPAL_CALLBACK_URL: ${PESAPAL_CALLBACK_URL}
+      PESAPAL_IPN_URL: ${PESAPAL_IPN_URL}
+      PAYMENT_CURRENCY: ${PAYMENT_CURRENCY}
+      BUSINESS_NAME: ${BUSINESS_NAME}
     ports:
       - "8080:8080"
     networks:
