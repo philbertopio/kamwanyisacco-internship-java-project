@@ -8,23 +8,32 @@ on:
 
 env:
   IMAGE_NAME: kimwanyi-sacco
+  REGISTRY: ghcr.io
 
 jobs:
   build-and-push:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Log in to Docker Hub
+      - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
+      - name: Lowercase repo owner for image tag
+        id: owner
+        run: echo "owner=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
 
       - name: Build and push image
         uses: docker/build-push-action@v6
@@ -32,8 +41,8 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ghcr.io/${{ steps.owner.outputs.owner }}/${{ env.IMAGE_NAME }}:latest
+            ghcr.io/${{ steps.owner.outputs.owner }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -44,6 +53,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Lowercase repo owner for image tag
+        id: owner
+        run: echo "owner=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
 
       - name: Copy docker-compose.yml to server
         uses: appleboy/scp-action@v0.1.7
@@ -65,13 +78,12 @@ jobs:
             cd ${{ secrets.DEPLOY_PATH }}
 
             cat > .env << 'ENVEOF'
-            DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-            IMAGE_NAME=${{ env.IMAGE_NAME }}
+            IMAGE_NAME=ghcr.io/${{ steps.owner.outputs.owner }}/${{ env.IMAGE_NAME }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             ENVEOF
 
-            podman compose pull app
-            podman compose up -d
+            podman-compose pull app
+            podman-compose up -d
             podman image prune -f
             echo "✅ Deployment complete"
 
