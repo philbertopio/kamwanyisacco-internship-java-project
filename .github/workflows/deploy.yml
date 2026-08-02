@@ -113,6 +113,14 @@ jobs:
             PAYMENT_CURRENCY=${{ secrets.PAYMENT_CURRENCY }}
             BUSINESS_NAME=${{ secrets.BUSINESS_NAME }}
             ENVEOF
+            
+            # Pull from GHCR under the real repo path
+            podman pull ghcr.io/${{ steps.owner.outputs.owner }}/${{ env.IMAGE_NAME }}:latest
+            podman pull ghcr.io/${{ steps.owner.outputs.owner }}/mysql-mirror:8.0
+
+            # Retag locally so `podman ps` shows a clean, client-facing name
+            podman tag ghcr.io/${{ steps.owner.outputs.owner }}/${{ env.IMAGE_NAME }}:latest kimwanyisacco/app:latest
+            podman tag ghcr.io/${{ steps.owner.outputs.owner }}/mysql-mirror:8.0 kimwanyisacco/mysql:8.0
 
             podman-compose pull
             podman-compose up -d
