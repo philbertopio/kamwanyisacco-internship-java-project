@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kimwanyi-deployment
+  labels:
+    app: kimwanyi-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kimwanyi-deployment
+
+  template:
+    metadata:
+      labels:
+        app: kimwanyi-deployment
+    spec:
+      containers:
+        - name: campusin
+          image: baseone/kimwanyi-deployment:latest
+          ports:
+            - containerPort: 8080
